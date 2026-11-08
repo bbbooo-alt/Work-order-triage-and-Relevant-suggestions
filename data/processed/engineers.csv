@@ -1,0 +1,13 @@
+﻿engineer_id,name,team,level,capacity,timezone,active
+1,E01,Network & Infra,3,5,Asia/Shanghai,True
+2,E02,Platform & Cloud,2,4,Asia/Shanghai,True
+3,E03,Security,2,4,Asia/Shanghai,True
+4,E04,Apps & Endpoints,2,6,Asia/Shanghai,True
+5,E05,Business Desk,3,8,Asia/Shanghai,True
+6,E06,Network & Infra,3,8,Asia/Shanghai,True
+7,E07,Platform & Cloud,1,7,Asia/Shanghai,True
+8,E08,Security,3,4,Asia/Shanghai,True
+9,E09,Apps & Endpoints,1,6,Asia/Shanghai,True
+10,E10,Business Desk,2,8,Asia/Shanghai,True
+11,E11,Network & Infra,3,6,Asia/Shanghai,True
+12,E12,Platform & Cloud,1,5,Asia/Shanghai,True
