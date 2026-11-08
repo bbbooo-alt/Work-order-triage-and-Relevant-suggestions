@@ -1,0 +1,9 @@
+{
+  "min_macro_f1_gain_over_keyword_baseline": 0.03,
+  "no_class_f1_regression": true,
+  "routing_valid_rate_min": 0.90,
+  "routing_timeout_rate_max": 0.20,
+  "frozen_test_set": "eval/split_frozen.csv",
+  "test_set_evaluations": 1,
+  "note": "阶段 2 及以后模型的进阶门槛：macro-F1 相对关键词基线至少 +3 个点、无任一类别 F1 下降、路由派单成功率不低于 90%、超时率不高于 20%。第一步只负责把门槛写死，不用于判定基线本身。test 集只在最终评一次。"
+}
