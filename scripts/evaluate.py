@@ -28,7 +28,9 @@ def _classification_metrics(y_true, y_pred, labels):
     return result
 
 
-def run() -> dict:
+def run(extra_models=None, report_path=None) -> dict:
+    """默认只评第一步的两条基线；传入 extra_models 可加入新模型，report_path 可指定独立报告文件。"""
+    model_versions = BASELINE_MODELS + list(extra_models or [])
     conn = connect()
     cur = conn.cursor()
     labels = {}
@@ -39,11 +41,11 @@ def run() -> dict:
     cur.execute("""SELECT t.ticket_id, t.type, t.queue, t.priority, t.language,
                           r.model_version, r.pred_type, r.pred_queue, r.pred_priority
                    FROM tickets t JOIN triage_results r USING (ticket_id)
-                   WHERE t.split = 'test' AND r.model_version = ANY(%s)""", (BASELINE_MODELS,))
+                   WHERE t.split = 'test' AND r.model_version = ANY(%s)""", (model_versions,))
     rows = cur.fetchall()
 
     models = {}
-    for model_version in BASELINE_MODELS:
+    for model_version in model_versions:
         subset = [r for r in rows if r[5] == model_version]
         entry = {"rows": len(subset)}
         for task, ti, pi in TASKS:
@@ -95,7 +97,7 @@ def run() -> dict:
     cur.execute("""SELECT count(*) FROM triage_results r
                    WHERE r.model_version = ANY(%s)
                      AND r.ticket_id NOT IN (SELECT ticket_id FROM tickets WHERE split = 'test')""",
-                (BASELINE_MODELS,))
+                (model_versions,))
     stray_predictions = cur.fetchone()[0]
     cur.execute("SELECT split, count(*) FROM tickets GROUP BY 1")
     split_counts = dict(cur.fetchall())
@@ -105,6 +107,7 @@ def run() -> dict:
     thresholds = load_json(THRESHOLD_FILE) if THRESHOLD_FILE.exists() else {}
     report = {
         "generated_at": datetime.datetime.now().isoformat(timespec="seconds"),
+        "model_versions": model_versions,
         "split_counts": split_counts,
         "split_check": split_check,
         "models": models,
@@ -116,7 +119,7 @@ def run() -> dict:
         },
         "thresholds": thresholds,
     }
-    dump_json(REPORT_FILE, report)
+    dump_json(report_path or REPORT_FILE, report)
     return report
 
 

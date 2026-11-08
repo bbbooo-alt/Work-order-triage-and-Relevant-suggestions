@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第二步验收 · 分诊</title>
+<style>
+  :root{
+    --bg:#f7f6fb; --card:#fff; --text:#1f2937; --muted:#6b7280;
+    --line:#e5e7eb; --primary:#7c3aed; --primary-dark:#6d28d9;
+    --ok:#16a34a; --ok-bg:#f0fdf4; --bad:#dc2626; --bad-bg:#fef2f2;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+       font-family:"Microsoft YaHei","PingFang SC",system-ui,-apple-system,sans-serif;
+       font-size:15px;line-height:1.6}
+  .wrap{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
+  header h1{margin:0 0 6px;font-size:26px}
+  header p{margin:0;color:var(--muted)}
+  .tip{background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;
+       padding:14px 18px;margin:20px 0;color:#4c1d95}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+        padding:20px 22px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .card h2{font-size:18px;margin:0 0 14px}
+  .btns{display:flex;flex-wrap:wrap;gap:10px}
+  button{font:inherit;cursor:pointer;border-radius:9px;padding:11px 20px;border:1px solid var(--line);
+         background:#fff;color:var(--text);transition:.15s}
+  button:hover:not(:disabled){border-color:var(--primary);color:var(--primary)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .primary{background:var(--primary);color:#fff;border-color:var(--primary);
+           font-weight:600;font-size:16px;padding:13px 28px}
+  .primary:hover:not(:disabled){background:var(--primary-dark);color:#fff;border-color:var(--primary-dark)}
+  .busy{margin-top:12px;color:var(--primary);font-weight:600;display:none}
+  .err{background:var(--bad-bg);border:1px solid #fecaca;color:#991b1b;
+       padding:12px 16px;border-radius:9px;margin-top:14px;white-space:pre-wrap;display:none}
+  .overview{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .score{font-size:40px;font-weight:700;line-height:1}
+  .badge{padding:6px 16px;border-radius:999px;font-weight:600}
+  .badge.ok{background:var(--ok-bg);color:var(--ok);border:1px solid #bbf7d0}
+  .badge.bad{background:var(--bad-bg);color:var(--bad);border:1px solid #fecaca}
+  .check{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .check:last-child{border-bottom:none}
+  .dot{width:10px;height:10px;border-radius:50%;margin-top:7px;flex:none}
+  .check.ok .dot{background:var(--ok)} .check.bad .dot{background:var(--bad)}
+  .check b{font-weight:600}
+  .check .detail{color:var(--muted);font-size:13px;margin-top:2px;word-break:break-all}
+  .tag{margin-left:auto;flex:none;font-size:13px;font-weight:600}
+  .check.ok .tag{color:var(--ok)} .check.bad .tag{color:var(--bad)}
+  .nums{display:flex;gap:12px;flex-wrap:wrap}
+  .num{flex:1;min-width:135px;background:#faf9fe;border:1px solid var(--line);
+       border-radius:10px;padding:14px}
+  .num .k{color:var(--muted);font-size:13px}
+  .num .v{font-size:22px;font-weight:700;margin-top:2px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left}
+  th{color:var(--muted);font-weight:600;background:#faf9fe}
+  td.n{font-variant-numeric:tabular-nums;font-weight:600}
+  tr.hi td{background:#f5f3ff}
+  .muted{color:var(--muted);font-size:13px}
+  .hidden{display:none}
+  footer{color:var(--muted);font-size:13px;margin-top:24px;line-height:1.9}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>第二步验收 · 分诊</h1>
+    <p>工单分类 ＋ 优先级判定 · 独立验收页面（端口 8766，与第一步页面完全分开）</p>
+  </header>
+
+  <div class="tip">
+    这一步训练一个轻量线性模型，由工单文本预测<b>工单类型 / 处理部门 / 优先级</b>，
+    再用第一步那把统一的尺子打分，检查是否跨过提前写死的门槛。点大按钮即可自动完成，不需要敲命令。
+    <b>训练可能需要一两分钟，请耐心等提示消失。</b>
+  </div>
+
+  <div class="card">
+    <h2>操作</h2>
+    <div class="btns">
+      <button class="primary" id="btnAll">一键验收第二步（推荐）</button>
+      <button id="btnTrain">只重新训练模型</button>
+      <button id="btnEvaluate">只重新计算指标</button>
+      <button id="btnStatus">刷新状态</button>
+    </div>
+    <div class="busy" id="busy">正在执行，请稍候…</div>
+    <div class="err" id="err"></div>
+  </div>
+
+  <div class="card">
+    <h2>当前状态</h2>
+    <div id="status" class="muted">正在读取…</div>
+  </div>
+
+  <div class="card hidden" id="resultCard">
+    <h2>验收结果</h2>
+    <div class="overview">
+      <div class="score" id="score">0 / 0</div>
+      <div>
+        <span class="badge" id="badge">未运行</span>
+        <div class="muted" id="resultHint"></div>
+      </div>
+    </div>
+    <div id="checks" style="margin-top:14px"></div>
+  </div>
+
+  <div class="card hidden" id="dataCard">
+    <h2>关键数字</h2>
+    <div class="muted" style="margin-bottom:8px">macro-F1（宏平均 F1，各类别等权，越高越好）</div>
+    <table>
+      <thead><tr><th>模型</th><th>工单类型</th><th>处理部门</th><th>优先级</th></tr></thead>
+      <tbody id="metricRows"></tbody>
+    </table>
+    <div class="muted" style="margin-top:8px">
+      高亮行是第二步新训练的分诊模型；必须明显超过「关键词规则基线」才算合格。
+    </div>
+
+    <div class="muted" style="margin:20px 0 10px">优先级有序性与分语种表现</div>
+    <div class="nums" id="extraNums"></div>
+
+    <div class="muted" style="margin:20px 0 8px">按语种分层（en 英文 / de 德文）的三个任务 macro-F1</div>
+    <table>
+      <thead><tr><th>语种</th><th>模型</th><th>工单类型</th><th>处理部门</th><th>优先级</th></tr></thead>
+      <tbody id="langRows"></tbody>
+    </table>
+
+    <div class="muted" style="margin:20px 0 10px">模型配置与低置信度出口</div>
+    <div id="modelInfo" class="muted"></div>
+  </div>
+
+  <footer>
+    <div><b>这些检查在验什么（大白话）</b></div>
+    <div>1. 第一步冻结的划分、基线分数有没有被第二步改动或覆盖。</div>
+    <div>2. 模型是不是只在训练集拟合、在验证集挑配置，测试集只评一次（防作弊）。</div>
+    <div>3. 三个任务的分数是否跨过提前写死的门槛，且没有任何一个类别变差。</div>
+    <div>4. 优先级是有高低的（low &lt; medium &lt; high），所以额外看平均误差和「高判成低」的严重错误。</div>
+    <div>5. 英文、德文分别不掉点；没把握的工单是否被识别出来、可以转人工。</div>
+    <div>6. 真值表与线上派单表始终没被写脏。</div>
+    <div style="margin-top:10px">本页只验收第二步。确认通过后，才会开始第三步（解决建议）。</div>
+  </footer>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pct = (x) => (Number(x) * 100).toFixed(1) + '%';
+
+function busy(on, text) {
+  $('#busy').style.display = on ? 'block' : 'none';
+  if (text) $('#busy').textContent = text;
+  document.querySelectorAll('button').forEach(b => b.disabled = on);
+}
+function showError(msg) {
+  const e = $('#err');
+  e.style.display = msg ? 'block' : 'none';
+  e.textContent = msg || '';
+}
+async function post(url) { const r = await fetch(url, {method:'POST'}); return r.json(); }
+async function get(url) { const r = await fetch(url); return r.json(); }
+function numBlock(k, v) {
+  return `<div class="num"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`;
+}
+
+async function refreshStatus() {
+  try {
+    const s = await get('/api/status');
+    if (!s.db_ok) { $('#status').innerHTML = `<span style="color:var(--bad)">数据库未连接：${esc(s.error)}</span>`; return; }
+    const p = s.predictions || {};
+    const sp = s.splits || {};
+    $('#status').innerHTML =
+      `数据库连接正常 · 工单 ${s.tickets} 行（train ${sp.train||0} / val ${sp.val||0} / test ${sp.test||0}）<br>` +
+      `各模型预测条数：` + Object.entries(p).map(([k,v]) => `${esc(k)} ${v}`).join('、') + `<br>` +
+      `第一步报告 ${s.step1_report_exists?'完好':'缺失'} · 第二步报告 ${s.step2_report_exists?'已生成':'未生成'} · ` +
+      `线上派单表 ${s.assignments_rows} 行 · 本页端口 ${s.port}`;
+  } catch (e) { $('#status').textContent = '读取状态失败：' + e; }
+}
+
+function render(data) {
+  showError(data.error ? ('执行出错：' + data.error + (data.trace ? '\n\n' + data.trace : '')) : '');
+  const checks = data.checks || [];
+  const passed = checks.filter(c => c.passed).length;
+  $('#resultCard').classList.remove('hidden');
+  $('#score').textContent = passed + ' / ' + checks.length;
+  const badge = $('#badge');
+  badge.textContent = data.ok ? '全部通过' : (checks.length ? '未通过' : '未运行');
+  badge.className = 'badge ' + (data.ok ? 'ok' : 'bad');
+  $('#resultHint').textContent = data.ok
+    ? '第二步已完成，可以进入第三步（解决建议）。'
+    : '请查看下面未通过的检查项。';
+  $('#checks').innerHTML = checks.map(c =>
+    `<div class="check ${c.passed?'ok':'bad'}"><span class="dot"></span>
+       <div><b>${esc(c.name)}</b><div class="detail">${esc(c.detail)}</div></div>
+       <span class="tag">${c.passed?'通过':'未通过'}</span></div>`).join('');
+
+  const rep = data.report;
+  $('#dataCard').classList.toggle('hidden', !rep);
+  if (!rep) return;
+  const m = rep.models || {};
+  const row = (label, key, hi) => {
+    const e = m[key];
+    if (!e) return `<tr><td>${esc(label)}</td><td colspan="3">无数据</td></tr>`;
+    return `<tr class="${hi?'hi':''}"><td>${esc(label)}</td><td class="n">${e.type.macro_f1}</td>
+      <td class="n">${e.queue.macro_f1}</td><td class="n">${e.priority.macro_f1}</td></tr>`;
+  };
+  $('#metricRows').innerHTML =
+    row('多数类基线', 'majority-v0', false) +
+    row('关键词规则基线（第一步）', 'keyword-v0', false) +
+    row('分诊模型（第二步）', 'triage-l1-v1', true);
+
+  const base = m['keyword-v0'] || {}, cur = m['triage-l1-v1'] || {};
+  $('#extraNums').innerHTML =
+    numBlock('优先级 MAE（基线 → 现在）', `${base.priority?.mae ?? '-'} → ${cur.priority?.mae ?? '-'}`) +
+    numBlock('严重错误率（基线 → 现在）', `${pct(base.priority?.severe_error_rate ?? 0)} → ${pct(cur.priority?.severe_error_rate ?? 0)}`) +
+    numBlock('测试集工单数', rep.split_counts?.test ?? '-');
+
+  let lang = '';
+  for (const l of ['en','de']) {
+    for (const [label,key] of [['第一步基线','keyword-v0'],['第二步模型','triage-l1-v1']]) {
+      const e = (m[key]?.by_language || {})[l] || {};
+      lang += `<tr><td>${l}</td><td>${label}</td><td class="n">${e.type ?? '-'}</td>` +
+              `<td class="n">${e.queue ?? '-'}</td><td class="n">${e.priority ?? '-'}</td></tr>`;
+    }
+  }
+  $('#langRows').innerHTML = lang;
+
+  const t = rep.triage || {};
+  const cands = t.config_candidates || {};
+  $('#modelInfo').innerHTML =
+    `向量化：${esc(t.vectorizer || '-')}<br>` +
+    `分类器：${esc(t.classifier || '-')}<br>` +
+    `拟合范围：${esc(t.fitted_on || '-')}；配置由 ${esc(t.selected_by || '-')} 选定为 ` +
+    `<b>${esc(t.selected_config || '-')}</b>（候选：${Object.entries(cands).map(([k,v]) => esc(k)+' '+v.avg).join(' / ')}）<br>` +
+    `低置信度阈值 ${esc(t.low_confidence_threshold ?? '-')}；test 集中 ` +
+    `<b>${esc(t.low_confidence_tickets ?? '-')}</b> 条低于阈值，建议转人工。<br>` +
+    `说明：${esc(t.note || '-')}`;
+}
+
+async function runAll() {
+  busy(true, '正在训练模型并验收（约需一两分钟）：训练 → 预测 → 统一评测 → 逐项检查…');
+  showError('');
+  try {
+    const data = await post('/api/run_all');
+    render(data);
+    await refreshStatus();
+  } catch (e) { showError('请求失败：' + e); }
+  finally { busy(false); }
+}
+async function simple(url, label) {
+  busy(true, label + '，请稍候…');
+  showError('');
+  try {
+    const d = await post(url);
+    if (!d.ok) showError('执行出错：' + d.error);
+    else $('#status').textContent = d.message + '（可点「一键验收第二步」查看完整结果）';
+    await refreshStatus();
+  } catch (e) { showError('请求失败：' + e); }
+  finally { busy(false); }
+}
+
+$('#btnAll').onclick = runAll;
+$('#btnTrain').onclick = () => simple('/api/train', '正在重新训练分诊模型');
+$('#btnEvaluate').onclick = () => simple('/api/evaluate', '正在重新计算指标');
+$('#btnStatus').onclick = refreshStatus;
+window.addEventListener('load', refreshStatus);
+</script>
+</body>
+</html>
