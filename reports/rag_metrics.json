@@ -1,0 +1,202 @@
+{
+  "generated_at": "2026-11-10T07:49:22",
+  "corpus": {
+    "answer": 3032,
+    "kb": 12,
+    "body": 800
+  },
+  "indexes": [
+    "idx_rk_embedding_hnsw",
+    "idx_rk_fts"
+  ],
+  "golden_set": {
+    "size": 50,
+    "file": "F:\\0MyProject\\工单分诊与解决建议\\eval\\golden_set.csv",
+    "label_type": "weak_label",
+    "note": "弱标注：以工单首个技能域对应的权威知识文档作为相关文档，非人工逐条标注"
+  },
+  "retrieval": {
+    "vector": {
+      "recall_at_5": 0.9333,
+      "mrr": 0.6706,
+      "mean_correct_kb_rank": 2.1,
+      "abstain_rate": 0.4667,
+      "kb_in_top5_rate": 1.0,
+      "keyword_used_rate": 0.0,
+      "reranked_rate": 0.0,
+      "cases": 30
+    },
+    "hybrid": {
+      "recall_at_5": 0.9333,
+      "mrr": 0.6706,
+      "mean_correct_kb_rank": 2.1,
+      "abstain_rate": 0.2667,
+      "kb_in_top5_rate": 1.0,
+      "keyword_used_rate": 1.0,
+      "reranked_rate": 0.9333,
+      "cases": 30
+    }
+  },
+  "keyword_tuning": {
+    "candidates": {
+      "0.0": {
+        "mrr": 0.6333,
+        "recall_at_5": 0.85,
+        "mean_correct_kb_rank": 2.25
+      },
+      "0.3": {
+        "mrr": 0.7083,
+        "recall_at_5": 0.9,
+        "mean_correct_kb_rank": 1.95
+      },
+      "0.6": {
+        "mrr": 0.6667,
+        "recall_at_5": 0.9,
+        "mean_correct_kb_rank": 2.15
+      },
+      "0.9": {
+        "mrr": 0.6583,
+        "recall_at_5": 0.9,
+        "mean_correct_kb_rank": 2.2
+      }
+    },
+    "validation_selected": 0.3,
+    "guard_triggered": true,
+    "final_weight": 0.0,
+    "tune_size": 20,
+    "holdout_size": 30,
+    "note": "前 20 条只用于挑关键词权重，后 30 条不参与挑权重。验证集按 MRR 降序、平均排名升序、权重升序择优；若该配置在隔离评测子集上出现回退，护栏自动降级为纯向量（权重 0）。护栏只做降级、不做优化，因此不会把评测集用来反向调参。"
+  },
+  "abstain_probes": [
+    {
+      "query": "zzzqqq unrelated nonsense query no known terms",
+      "triggered": true,
+      "lexical_overlap": 0,
+      "best_similarity": 0.5364,
+      "margin_over_median": 0.2957
+    },
+    {
+      "query": "banana recipes for birthday cake",
+      "triggered": true,
+      "lexical_overlap": 0,
+      "best_similarity": 0.3552,
+      "margin_over_median": 0.1458
+    },
+    {
+      "query": "asdkjhasd qweiop zxcvbn mnbv",
+      "triggered": true,
+      "lexical_overlap": 0,
+      "best_similarity": 0.6061,
+      "margin_over_median": 0.348
+    }
+  ],
+  "calibration": {
+    "positive_best_kb_similarity": {
+      "min": 0.3814,
+      "median": 0.5183,
+      "max": 0.6882
+    },
+    "negative_best_kb_similarity": {
+      "min": 0.3552,
+      "max": 0.6061
+    },
+    "distributions_overlap": true,
+    "conclusion": "实测相关工单与无关查询的余弦相似度分布重叠，绝对阈值和 top1 减中位数的间隔都不可靠；故拒答改用「查询实词与权威知识文档的词面重合数」，相似度只保留一个很低的兜底值。"
+  },
+  "sample_suggestion": {
+    "mode": "hybrid",
+    "results": [
+      {
+        "rank": 1,
+        "chunk_id": 3036,
+        "chunk_type": "kb",
+        "source_label": "权威知识文档",
+        "domain_id": 4,
+        "similarity": 0.44002828911879066,
+        "sources": [
+          "vector",
+          "keyword"
+        ],
+        "preview": "Cloud platform and SaaS incident handling. Check Kubernetes pods, microservices orchestration, CI/CD pipeline deployments, API gateways, integration endpoints and data lake synchronization. Collect deployment logs, servi"
+      },
+      {
+        "rank": 2,
+        "chunk_id": 3037,
+        "chunk_type": "kb",
+        "source_label": "权威知识文档",
+        "domain_id": 5,
+        "similarity": 0.3821002874205456,
+        "sources": [
+          "vector"
+        ],
+        "preview": "Software bug and performance investigation. Reproduce the issue, record the exact steps, browser and operating system version, capture crash logs and screenshots, check recent updates, patches and compatibility with the "
+      },
+      {
+        "rank": 3,
+        "chunk_id": 3035,
+        "chunk_type": "kb",
+        "source_label": "权威知识文档",
+        "domain_id": 3,
+        "similarity": 0.3739922440614828,
+        "sources": [
+          "vector",
+          "keyword"
+        ],
+        "preview": "Hardware and device troubleshooting for printers, headsets, scanners, SSD, NAS, projectors and audio devices. Confirm exact device model, operating system version, driver and firmware version, test a different cable or p"
+      },
+      {
+        "rank": 4,
+        "chunk_id": 3038,
+        "chunk_type": "kb",
+        "source_label": "权威知识文档",
+        "domain_id": 6,
+        "similarity": 0.3594469774392688,
+        "sources": [
+          "vector",
+          "keyword"
+        ],
+        "preview": "Account and access management. Verify login credentials, authentication tokens, license validity, password reset status, subscription state and multi-factor authentication. Ask for the affected account ID and the exact e"
+      },
+      {
+        "rank": 5,
+        "chunk_id": 3041,
+        "chunk_type": "kb",
+        "source_label": "权威知识文档",
+        "domain_id": 9,
+        "similarity": 0.3573354399721077,
+        "sources": [
+          "vector",
+          "keyword"
+        ],
+        "preview": "Product feature and documentation requests. Clarify the product model, integration target and intended use case, then provide the relevant manual, specification, API documentation, SDK guide or training material. If the "
+      }
+    ],
+    "best_similarity": 0.44,
+    "best_kb_similarity": 0.44,
+    "lexical_overlap": 3,
+    "keyword_hits": 20,
+    "reranked_by_keyword": 5,
+    "kb_keyword_hits": 5,
+    "kb_in_top_k": 5,
+    "abstain": false
+  },
+  "strategy": "只检索不生成（先验证检索质量，暂不调用大模型生成）",
+  "abstain_policy": {
+    "min_lexical_overlap": 1,
+    "similarity_floor": 0.3,
+    "note": "两个条件任一不满足即拒答并转人工"
+  },
+  "chunk_types": {
+    "answer": "客服回复（第一步已有）",
+    "body": "工单正文（第三步抽样）",
+    "kb": "权威知识文档（第三步新增）"
+  },
+  "embedding": {
+    "model": "qwen3-embedding:4b",
+    "native_dim": 2560,
+    "stored_dim": 1024
+  },
+  "thresholds": {
+    "top_k": 5
+  }
+}

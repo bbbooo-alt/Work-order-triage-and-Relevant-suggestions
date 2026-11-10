@@ -1,0 +1,1082 @@
+{
+  "generated_at": "2026-11-09T15:01:13",
+  "model_versions": [
+    "majority-v0",
+    "keyword-v0",
+    "triage-l1-v1",
+    "triage-shadow-v1"
+  ],
+  "split_counts": {
+    "test": 2858,
+    "train": 22871,
+    "val": 2858
+  },
+  "split_check": {
+    "frozen_rows": 28587,
+    "db_rows": 28587,
+    "mismatch_rows": 0,
+    "missing_in_db": 0,
+    "passed": true
+  },
+  "models": {
+    "majority-v0": {
+      "rows": 2858,
+      "type": {
+        "macro_f1": 0.1442,
+        "accuracy": 0.4052,
+        "per_class_f1": {
+          "Change": 0.0,
+          "Incident": 0.5767,
+          "Problem": 0.0,
+          "Request": 0.0
+        },
+        "confusion_matrix": [
+          [
+            0,
+            291,
+            0,
+            0
+          ],
+          [
+            0,
+            1158,
+            0,
+            0
+          ],
+          [
+            0,
+            579,
+            0,
+            0
+          ],
+          [
+            0,
+            830,
+            0,
+            0
+          ]
+        ],
+        "labels": [
+          "Change",
+          "Incident",
+          "Problem",
+          "Request"
+        ]
+      },
+      "queue": {
+        "macro_f1": 0.0452,
+        "accuracy": 0.2922,
+        "per_class_f1": {
+          "Billing and Payments": 0.0,
+          "Customer Service": 0.0,
+          "General Inquiry": 0.0,
+          "Human Resources": 0.0,
+          "IT Support": 0.0,
+          "Product Support": 0.0,
+          "Returns and Exchanges": 0.0,
+          "Sales and Pre-Sales": 0.0,
+          "Service Outages and Maintenance": 0.0,
+          "Technical Support": 0.4522
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            278
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            426
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            41
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            58
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            344
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            526
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            143
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            92
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            115
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            835
+          ]
+        ],
+        "labels": [
+          "Billing and Payments",
+          "Customer Service",
+          "General Inquiry",
+          "Human Resources",
+          "IT Support",
+          "Product Support",
+          "Returns and Exchanges",
+          "Sales and Pre-Sales",
+          "Service Outages and Maintenance",
+          "Technical Support"
+        ]
+      },
+      "priority": {
+        "macro_f1": 0.1913,
+        "accuracy": 0.4024,
+        "per_class_f1": {
+          "high": 0.0,
+          "low": 0.0,
+          "medium": 0.5739
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1118
+          ],
+          [
+            0,
+            0,
+            590
+          ],
+          [
+            0,
+            0,
+            1150
+          ]
+        ],
+        "labels": [
+          "high",
+          "low",
+          "medium"
+        ],
+        "mae": 0.5976,
+        "severe_error_rate": 0.0
+      },
+      "by_language": {
+        "en": {
+          "type": 0.1471,
+          "queue": 0.0449,
+          "priority": 0.1922
+        },
+        "de": {
+          "type": 0.1402,
+          "queue": 0.0456,
+          "priority": 0.19
+        }
+      }
+    },
+    "keyword-v0": {
+      "rows": 2858,
+      "type": {
+        "macro_f1": 0.307,
+        "accuracy": 0.3954,
+        "per_class_f1": {
+          "Change": 0.2495,
+          "Incident": 0.2708,
+          "Problem": 0.1763,
+          "Request": 0.5313
+        },
+        "confusion_matrix": [
+          [
+            61,
+            13,
+            0,
+            217
+          ],
+          [
+            78,
+            192,
+            114,
+            774
+          ],
+          [
+            45,
+            49,
+            67,
+            418
+          ],
+          [
+            14,
+            6,
+            0,
+            810
+          ]
+        ],
+        "labels": [
+          "Change",
+          "Incident",
+          "Problem",
+          "Request"
+        ]
+      },
+      "queue": {
+        "macro_f1": 0.2165,
+        "accuracy": 0.2313,
+        "per_class_f1": {
+          "Billing and Payments": 0.7175,
+          "Customer Service": 0.1822,
+          "General Inquiry": 0.0,
+          "Human Resources": 0.0838,
+          "IT Support": 0.1201,
+          "Product Support": 0.1245,
+          "Returns and Exchanges": 0.1392,
+          "Sales and Pre-Sales": 0.0699,
+          "Service Outages and Maintenance": 0.4116,
+          "Technical Support": 0.3162
+        },
+        "confusion_matrix": [
+          [
+            160,
+            28,
+            0,
+            21,
+            12,
+            8,
+            0,
+            37,
+            0,
+            12
+          ],
+          [
+            2,
+            80,
+            0,
+            68,
+            49,
+            23,
+            1,
+            139,
+            5,
+            59
+          ],
+          [
+            0,
+            9,
+            0,
+            4,
+            2,
+            5,
+            0,
+            13,
+            1,
+            7
+          ],
+          [
+            0,
+            6,
+            0,
+            16,
+            5,
+            3,
+            0,
+            9,
+            2,
+            17
+          ],
+          [
+            2,
+            49,
+            0,
+            30,
+            38,
+            23,
+            0,
+            80,
+            34,
+            88
+          ],
+          [
+            1,
+            81,
+            0,
+            64,
+            60,
+            43,
+            2,
+            154,
+            18,
+            103
+          ],
+          [
+            1,
+            29,
+            0,
+            18,
+            9,
+            4,
+            11,
+            35,
+            4,
+            32
+          ],
+          [
+            0,
+            17,
+            0,
+            15,
+            8,
+            7,
+            0,
+            27,
+            2,
+            16
+          ],
+          [
+            0,
+            12,
+            0,
+            10,
+            5,
+            3,
+            0,
+            8,
+            64,
+            13
+          ],
+          [
+            2,
+            141,
+            0,
+            78,
+            101,
+            46,
+            1,
+            178,
+            66,
+            222
+          ]
+        ],
+        "labels": [
+          "Billing and Payments",
+          "Customer Service",
+          "General Inquiry",
+          "Human Resources",
+          "IT Support",
+          "Product Support",
+          "Returns and Exchanges",
+          "Sales and Pre-Sales",
+          "Service Outages and Maintenance",
+          "Technical Support"
+        ]
+      },
+      "priority": {
+        "macro_f1": 0.3518,
+        "accuracy": 0.3915,
+        "per_class_f1": {
+          "high": 0.2358,
+          "low": 0.317,
+          "medium": 0.5026
+        },
+        "confusion_matrix": [
+          [
+            162,
+            277,
+            679
+          ],
+          [
+            21,
+            229,
+            340
+          ],
+          [
+            73,
+            349,
+            728
+          ]
+        ],
+        "labels": [
+          "high",
+          "low",
+          "medium"
+        ],
+        "mae": 0.7127,
+        "severe_error_rate": 0.1043
+      },
+      "by_language": {
+        "en": {
+          "type": 0.273,
+          "queue": 0.2628,
+          "priority": 0.356
+        },
+        "de": {
+          "type": 0.3382,
+          "queue": 0.1813,
+          "priority": 0.3461
+        }
+      }
+    },
+    "triage-l1-v1": {
+      "rows": 2858,
+      "type": {
+        "macro_f1": 0.8362,
+        "accuracy": 0.8261,
+        "per_class_f1": {
+          "Change": 0.9759,
+          "Incident": 0.7894,
+          "Problem": 0.5873,
+          "Request": 0.9922
+        },
+        "confusion_matrix": [
+          [
+            283,
+            3,
+            0,
+            5
+          ],
+          [
+            2,
+            909,
+            245,
+            2
+          ],
+          [
+            1,
+            233,
+            343,
+            2
+          ],
+          [
+            3,
+            0,
+            1,
+            826
+          ]
+        ],
+        "labels": [
+          "Change",
+          "Incident",
+          "Problem",
+          "Request"
+        ]
+      },
+      "queue": {
+        "macro_f1": 0.428,
+        "accuracy": 0.4433,
+        "per_class_f1": {
+          "Billing and Payments": 0.7331,
+          "Customer Service": 0.3566,
+          "General Inquiry": 0.3469,
+          "Human Resources": 0.3085,
+          "IT Support": 0.3772,
+          "Product Support": 0.3879,
+          "Returns and Exchanges": 0.3664,
+          "Sales and Pre-Sales": 0.3067,
+          "Service Outages and Maintenance": 0.6007,
+          "Technical Support": 0.4956
+        },
+        "confusion_matrix": [
+          [
+            195,
+            28,
+            3,
+            2,
+            5,
+            8,
+            6,
+            19,
+            1,
+            11
+          ],
+          [
+            13,
+            148,
+            9,
+            26,
+            26,
+            72,
+            26,
+            48,
+            6,
+            52
+          ],
+          [
+            0,
+            2,
+            17,
+            4,
+            3,
+            8,
+            2,
+            3,
+            0,
+            2
+          ],
+          [
+            1,
+            7,
+            2,
+            31,
+            3,
+            5,
+            1,
+            2,
+            0,
+            6
+          ],
+          [
+            7,
+            33,
+            7,
+            15,
+            119,
+            31,
+            15,
+            14,
+            18,
+            85
+          ],
+          [
+            14,
+            72,
+            5,
+            21,
+            38,
+            199,
+            35,
+            40,
+            12,
+            90
+          ],
+          [
+            5,
+            20,
+            1,
+            4,
+            7,
+            24,
+            61,
+            7,
+            1,
+            13
+          ],
+          [
+            2,
+            10,
+            2,
+            3,
+            1,
+            10,
+            10,
+            48,
+            3,
+            3
+          ],
+          [
+            1,
+            4,
+            1,
+            2,
+            6,
+            3,
+            0,
+            5,
+            85,
+            8
+          ],
+          [
+            16,
+            80,
+            10,
+            35,
+            79,
+            140,
+            34,
+            35,
+            42,
+            364
+          ]
+        ],
+        "labels": [
+          "Billing and Payments",
+          "Customer Service",
+          "General Inquiry",
+          "Human Resources",
+          "IT Support",
+          "Product Support",
+          "Returns and Exchanges",
+          "Sales and Pre-Sales",
+          "Service Outages and Maintenance",
+          "Technical Support"
+        ]
+      },
+      "priority": {
+        "macro_f1": 0.5337,
+        "accuracy": 0.5518,
+        "per_class_f1": {
+          "high": 0.6082,
+          "low": 0.4419,
+          "medium": 0.551
+        },
+        "confusion_matrix": [
+          [
+            683,
+            125,
+            310
+          ],
+          [
+            108,
+            251,
+            231
+          ],
+          [
+            337,
+            170,
+            643
+          ]
+        ],
+        "labels": [
+          "high",
+          "low",
+          "medium"
+        ],
+        "mae": 0.5297,
+        "severe_error_rate": 0.0815
+      },
+      "by_language": {
+        "en": {
+          "type": 0.8407,
+          "queue": 0.4677,
+          "priority": 0.5445
+        },
+        "de": {
+          "type": 0.83,
+          "queue": 0.3714,
+          "priority": 0.5188
+        }
+      }
+    },
+    "triage-shadow-v1": {
+      "rows": 2858,
+      "type": {
+        "macro_f1": 0.8384,
+        "accuracy": 0.8265,
+        "per_class_f1": {
+          "Change": 0.9775,
+          "Incident": 0.787,
+          "Problem": 0.5953,
+          "Request": 0.994
+        },
+        "confusion_matrix": [
+          [
+            282,
+            3,
+            1,
+            5
+          ],
+          [
+            2,
+            896,
+            259,
+            1
+          ],
+          [
+            1,
+            220,
+            356,
+            2
+          ],
+          [
+            1,
+            0,
+            1,
+            828
+          ]
+        ],
+        "labels": [
+          "Change",
+          "Incident",
+          "Problem",
+          "Request"
+        ]
+      },
+      "queue": {
+        "macro_f1": 0.4219,
+        "accuracy": 0.4468,
+        "per_class_f1": {
+          "Billing and Payments": 0.7094,
+          "Customer Service": 0.3749,
+          "General Inquiry": 0.2764,
+          "Human Resources": 0.2994,
+          "IT Support": 0.389,
+          "Product Support": 0.373,
+          "Returns and Exchanges": 0.3742,
+          "Sales and Pre-Sales": 0.3289,
+          "Service Outages and Maintenance": 0.5966,
+          "Technical Support": 0.4967
+        },
+        "confusion_matrix": [
+          [
+            199,
+            29,
+            3,
+            2,
+            8,
+            10,
+            4,
+            9,
+            2,
+            12
+          ],
+          [
+            19,
+            161,
+            16,
+            16,
+            33,
+            59,
+            27,
+            24,
+            6,
+            65
+          ],
+          [
+            0,
+            4,
+            17,
+            2,
+            3,
+            7,
+            3,
+            1,
+            1,
+            3
+          ],
+          [
+            1,
+            7,
+            4,
+            25,
+            5,
+            3,
+            1,
+            1,
+            0,
+            11
+          ],
+          [
+            10,
+            32,
+            7,
+            12,
+            134,
+            24,
+            15,
+            10,
+            16,
+            84
+          ],
+          [
+            17,
+            79,
+            14,
+            15,
+            50,
+            177,
+            30,
+            24,
+            13,
+            107
+          ],
+          [
+            8,
+            18,
+            4,
+            4,
+            7,
+            21,
+            61,
+            4,
+            1,
+            15
+          ],
+          [
+            5,
+            13,
+            3,
+            3,
+            3,
+            8,
+            9,
+            37,
+            5,
+            6
+          ],
+          [
+            1,
+            5,
+            1,
+            1,
+            7,
+            2,
+            1,
+            3,
+            88,
+            6
+          ],
+          [
+            23,
+            85,
+            13,
+            29,
+            95,
+            112,
+            32,
+            20,
+            48,
+            378
+          ]
+        ],
+        "labels": [
+          "Billing and Payments",
+          "Customer Service",
+          "General Inquiry",
+          "Human Resources",
+          "IT Support",
+          "Product Support",
+          "Returns and Exchanges",
+          "Sales and Pre-Sales",
+          "Service Outages and Maintenance",
+          "Technical Support"
+        ]
+      },
+      "priority": {
+        "macro_f1": 0.5319,
+        "accuracy": 0.5497,
+        "per_class_f1": {
+          "high": 0.6036,
+          "low": 0.4389,
+          "medium": 0.5531
+        },
+        "confusion_matrix": [
+          [
+            670,
+            132,
+            316
+          ],
+          [
+            108,
+            253,
+            229
+          ],
+          [
+            324,
+            178,
+            648
+          ]
+        ],
+        "labels": [
+          "high",
+          "low",
+          "medium"
+        ],
+        "mae": 0.5343,
+        "severe_error_rate": 0.084
+      },
+      "by_language": {
+        "en": {
+          "type": 0.8451,
+          "queue": 0.4684,
+          "priority": 0.5377
+        },
+        "de": {
+          "type": 0.8294,
+          "queue": 0.3609,
+          "priority": 0.5233
+        }
+      }
+    }
+  },
+  "routing": {
+    "model_version": "round-robin-v0",
+    "tickets": 500,
+    "valid_rate": 0.092,
+    "timeout_rate": 0.212,
+    "load_std": 0.47,
+    "load_min": 41,
+    "load_max": 42
+  },
+  "isolation": {
+    "assignments_rows": 0,
+    "stray_predictions_outside_test": 0,
+    "eval_table": "eval_assignments"
+  },
+  "thresholds": {
+    "min_macro_f1_gain_over_keyword_baseline": 0.03,
+    "no_class_f1_regression": true,
+    "routing_valid_rate_min": 0.9,
+    "routing_timeout_rate_max": 0.2,
+    "frozen_test_set": "eval/split_frozen.csv",
+    "test_set_evaluations": 1,
+    "note": "阶段 2 及以后模型的进阶门槛：macro-F1 相对关键词基线至少 +3 个点、无任一类别 F1 下降、路由派单成功率不低于 90%、超时率不高于 20%。第一步只负责把门槛写死，不用于判定基线本身。test 集只在最终评一次。"
+  },
+  "retraining": {
+    "generated_at": "2026-11-09T15:01:13",
+    "shadow_version": "triage-shadow-v1",
+    "feedback": {
+      "rows": 3,
+      "leaked_test_rows": 0,
+      "samples": [
+        {
+          "ticket_id": 3461,
+          "field": "priority",
+          "old_value": "high",
+          "new_value": "high"
+        },
+        {
+          "ticket_id": 5499,
+          "field": "priority",
+          "old_value": "low",
+          "new_value": "high"
+        },
+        {
+          "ticket_id": 8582,
+          "field": "priority",
+          "old_value": "medium",
+          "new_value": "high"
+        }
+      ],
+      "boost": 25
+    },
+    "dataset_hash": "0f49c9449c5ee293",
+    "train_rows": 22946,
+    "boosted_rows": 75,
+    "val_scores": {
+      "type": 0.8352,
+      "queue": 0.432,
+      "priority": 0.5161
+    },
+    "live_val_scores": {
+      "type": 0.8368,
+      "queue": 0.4258,
+      "priority": 0.5122
+    },
+    "val_delta": {
+      "type": -0.0016,
+      "queue": 0.0062,
+      "priority": 0.0039
+    },
+    "test_comparison": {
+      "baseline_keyword": {
+        "type": 0.307,
+        "queue": 0.2165,
+        "priority": 0.3518
+      },
+      "live": {
+        "type": 0.8362,
+        "queue": 0.428,
+        "priority": 0.5337
+      },
+      "shadow": {
+        "type": 0.8384,
+        "queue": 0.4219,
+        "priority": 0.5319
+      },
+      "priority_mae": {
+        "live": 0.5297,
+        "shadow": 0.5343
+      }
+    },
+    "frozen_split": {
+      "test": 2858,
+      "train": 22871,
+      "val": 2858
+    },
+    "promoted": false,
+    "promotion_rule": "val 三任务不掉点且 test 优先级 MAE 不劣化；本轮只产出影子版，不自动替换线上版本",
+    "note": "复用了第一步的统一评测脚本 evaluate.run，报告含 4 个模型；回流样本只来自 train，test 只用于最终复评，冻结划分不变。"
+  }
+}

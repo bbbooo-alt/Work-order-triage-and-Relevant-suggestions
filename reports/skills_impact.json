@@ -1,0 +1,40 @@
+{
+  "generated_at": "2026-11-09T12:45:58",
+  "gold": {
+    "assigned_count": 232,
+    "coverage_rate": 0.464,
+    "degraded_rate": 0.536,
+    "constraint_compliance": 1.0,
+    "timeout_rate": 0.12,
+    "load_std": 5.1,
+    "max_load_ratio": 0.875
+  },
+  "predicted": {
+    "assigned_count": 229,
+    "coverage_rate": 0.458,
+    "degraded_rate": 0.542,
+    "constraint_compliance": 1.0,
+    "timeout_rate": 0.134,
+    "load_std": 4.86,
+    "max_load_ratio": 0.875
+  },
+  "delta": {
+    "assigned_count": -3,
+    "coverage_rate": -0.006,
+    "degraded_rate": 0.006,
+    "constraint_compliance": 0.0,
+    "timeout_rate": 0.014,
+    "load_std": -0.24,
+    "max_load_ratio": 0.0
+  },
+  "skill_model": "skills-l1-v1",
+  "skill_metrics": {
+    "micro_f1": 0.8299,
+    "macro_f1": 0.7648,
+    "subset_accuracy": 0.3625,
+    "hamming_loss": 0.0794,
+    "avg_predicted_skills": 3.177,
+    "avg_true_skills": 2.89
+  },
+  "note": "gold（真值上界）是第四步原有的 route-v1；predicted 是 route-v1-predicted，除所需技能换成模型预测外，其余规则、时间映射、工单集合完全相同。差值即「分诊技能预测的误差」向下游路由传播的代价。"
+}

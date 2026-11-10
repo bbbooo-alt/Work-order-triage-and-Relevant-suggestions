@@ -1,0 +1,225 @@
+{
+  "generated_at": "2026-11-09T12:49:59",
+  "model": "qwen3:14b",
+  "strategy": "只基于检索片段生成；引用校验 + 词面 grounding 抽检；拒答不硬编",
+  "golden_set": {
+    "total": 50,
+    "reviewed": 0,
+    "draft": 50,
+    "file": "F:\\0MyProject\\工单分诊与解决建议\\eval\\golden_set_human.csv",
+    "note": "草稿由领域规则预填；页面标注台勾选后会把 reviewed 置为 true 并记 annotator=human_via_ui"
+  },
+  "golden_retrieval": {
+    "cases": 30,
+    "reviewed_cases": 0,
+    "recall_at_5": 0.9,
+    "mrr": 0.6028,
+    "note": "用 golden_labels 判定相关性；复核过的条数单独统计，草稿状态透明可见"
+  },
+  "sample_selection": {
+    "eligible_for_generation": 4,
+    "abstain_control": 2,
+    "note": "从标注集前 30 条里选 4 个检索未拒答样本评测生成，另取 2 个拒答样本作对照；筛选条件公开"
+  },
+  "comparison": [
+    {
+      "ticket_id": 1255,
+      "retrieval_only": {
+        "top_k": 5,
+        "abstain": false,
+        "best_kb_similarity": 0.449,
+        "top_sources": [
+          "权威知识文档",
+          "权威知识文档",
+          "权威知识文档"
+        ]
+      },
+      "with_generation": {
+        "abstained": true,
+        "steps": 0,
+        "citations": 0,
+        "citation_valid_rate": null,
+        "grounded": 0.0,
+        "latency_sec": 12.44,
+        "from_cache": false,
+        "reason": "insufficient evidence"
+      }
+    },
+    {
+      "ticket_id": 22284,
+      "retrieval_only": {
+        "top_k": 5,
+        "abstain": false,
+        "best_kb_similarity": 0.6718,
+        "top_sources": [
+          "相似历史工单",
+          "相似历史工单",
+          "权威知识文档"
+        ]
+      },
+      "with_generation": {
+        "abstained": false,
+        "steps": 2,
+        "citations": 1,
+        "citation_valid_rate": null,
+        "grounded": 0.0,
+        "latency_sec": 5.69,
+        "from_cache": true,
+        "reason": ""
+      }
+    },
+    {
+      "ticket_id": 18475,
+      "retrieval_only": {
+        "top_k": 5,
+        "abstain": false,
+        "best_kb_similarity": 0.5117,
+        "top_sources": [
+          "权威知识文档",
+          "权威知识文档",
+          "权威知识文档"
+        ]
+      },
+      "with_generation": {
+        "abstained": false,
+        "steps": 2,
+        "citations": 2,
+        "citation_valid_rate": null,
+        "grounded": 1.0,
+        "latency_sec": 5.04,
+        "from_cache": true,
+        "reason": ""
+      }
+    },
+    {
+      "ticket_id": 14880,
+      "retrieval_only": {
+        "top_k": 5,
+        "abstain": false,
+        "best_kb_similarity": 0.508,
+        "top_sources": [
+          "权威知识文档",
+          "权威知识文档",
+          "权威知识文档"
+        ]
+      },
+      "with_generation": {
+        "abstained": false,
+        "steps": 3,
+        "citations": 2,
+        "citation_valid_rate": 1.0,
+        "grounded": 0.6667,
+        "latency_sec": 3.97,
+        "from_cache": false,
+        "reason": ""
+      }
+    },
+    {
+      "ticket_id": 1213,
+      "retrieval_only": {
+        "top_k": 5,
+        "abstain": true,
+        "best_kb_similarity": 0.4361,
+        "top_sources": [
+          "相似历史工单",
+          "相似历史工单",
+          "权威知识文档"
+        ]
+      },
+      "with_generation": {
+        "abstained": true,
+        "steps": 0,
+        "citations": 0,
+        "citation_valid_rate": null,
+        "grounded": 0.0,
+        "latency_sec": 0.0,
+        "from_cache": false,
+        "reason": "检索侧拒答或无命中，不调用生成模型"
+      }
+    },
+    {
+      "ticket_id": 23073,
+      "retrieval_only": {
+        "top_k": 5,
+        "abstain": true,
+        "best_kb_similarity": 0.3898,
+        "top_sources": [
+          "相似历史工单",
+          "相似历史工单",
+          "权威知识文档"
+        ]
+      },
+      "with_generation": {
+        "abstained": true,
+        "steps": 0,
+        "citations": 0,
+        "citation_valid_rate": null,
+        "grounded": 0.0,
+        "latency_sec": 0.0,
+        "from_cache": false,
+        "reason": "检索侧拒答或无命中，不调用生成模型"
+      }
+    }
+  ],
+  "aggregate": {
+    "samples": 6,
+    "generated_ok": 3,
+    "abstained": 3,
+    "avg_grounded": 0.5556,
+    "avg_latency_sec": 4.9,
+    "cache_rows": 3
+  },
+  "manual_review": {
+    "file": "F:\\0MyProject\\工单分诊与解决建议\\eval\\generation_review.csv",
+    "pending": [
+      {
+        "ticket_id": 1255,
+        "relevance": null,
+        "executability": null,
+        "hallucination": null,
+        "status": "pending"
+      },
+      {
+        "ticket_id": 22284,
+        "relevance": null,
+        "executability": null,
+        "hallucination": null,
+        "status": "pending"
+      },
+      {
+        "ticket_id": 18475,
+        "relevance": null,
+        "executability": null,
+        "hallucination": null,
+        "status": "pending"
+      },
+      {
+        "ticket_id": 14880,
+        "relevance": null,
+        "executability": null,
+        "hallucination": null,
+        "status": "pending"
+      },
+      {
+        "ticket_id": 1213,
+        "relevance": null,
+        "executability": null,
+        "hallucination": null,
+        "status": "pending"
+      },
+      {
+        "ticket_id": 23073,
+        "relevance": null,
+        "executability": null,
+        "hallucination": null,
+        "status": "pending"
+      }
+    ],
+    "note": "相关性 / 可执行性 / 幻觉 三项 1-5 分，由页面抽检后写入"
+  },
+  "known_limits": [
+    "人工标注集初始为领域规则草稿，页面复核过的条数单独统计，草稿不等于人工标注。",
+    "grounding 用实词重合做近似，不是严格的自然语言推理核验；正式上线需人工评分 + LLM-as-judge 校准。",
+    "生成模型为本地 qwen3:14b，输出受提示词约束但无法完全杜绝幻觉。"
+  ]
+}

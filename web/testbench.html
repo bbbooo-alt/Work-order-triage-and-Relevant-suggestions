@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>分步验收台 · 按流程逐点测试</title>
+<style>
+:root{
+  --bg:#f4f6fa;--card:#fff;--text:#0f172a;--muted:#64748b;--line:#e2e8f0;
+  --primary:#4f46e5;--primary-dark:#4338ca;--soft:#eef2ff;
+  --ok:#059669;--ok-bg:#ecfdf5;--bad:#dc2626;--bad-bg:#fef2f2;
+  --warn:#d97706;--warn-bg:#fffbeb;--info:#0284c7;--info-bg:#f0f9ff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;
+     font-family:"Microsoft YaHei","PingFang SC",system-ui,-apple-system,"Segoe UI",sans-serif}
+.top{background:linear-gradient(115deg,#1e1b4b,#4f46e5 55%,#0e7490);color:#fff;padding:20px 0 18px}
+.wrap{max-width:1600px;margin:0 auto;padding:0 22px}
+.top .wrap{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap}
+.top h1{margin:0;font-size:23px;letter-spacing:.4px}
+.top p{margin:5px 0 0;color:#dbeafe;font-size:12.5px}
+.tpills{display:flex;gap:8px;flex-wrap:wrap}
+.tpill{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);
+       border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600}
+.main{max-width:1600px;margin:0 auto;padding:18px 22px 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:13px;
+      padding:16px 18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.bar{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--text);
+       border-radius:8px;padding:8px 14px;transition:.15s;font-weight:500;font-size:13px}
+button:hover:not(:disabled){border-color:var(--primary);color:var(--primary);background:var(--soft)}
+button:disabled{opacity:.5;cursor:not-allowed}
+button.primary{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:700}
+button.primary:hover:not(:disabled){background:var(--primary-dark);color:#fff}
+button.sm{padding:5px 11px;font-size:12px}
+button.danger{border-color:#fecaca;color:#b91c1c}
+button.danger:hover:not(:disabled){background:var(--bad-bg);color:#b91c1c}
+.progress{margin-top:10px;color:var(--primary);font-weight:700;font-size:13px;min-height:20px}
+.steps{display:flex;gap:7px;overflow-x:auto;padding:2px 0 8px}
+.step{flex:none;border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 12px;
+      cursor:pointer;font-size:12px;white-space:nowrap;color:var(--muted)}
+.step:hover{border-color:var(--primary);color:var(--primary)}
+.step b{color:var(--text);margin-right:5px}
+.grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:14px;align-items:start}
+@media(max-width:1180px){.grid{grid-template-columns:1fr}}
+.group{background:#fff;border:1px solid var(--line);border-radius:13px;margin-bottom:14px;overflow:hidden}
+.ghead{display:flex;align-items:center;gap:12px;padding:13px 16px;background:#f8fafc;cursor:pointer}
+.gno{width:28px;height:28px;flex:none;border-radius:8px;background:var(--primary);color:#fff;
+     display:grid;place-items:center;font-weight:800;font-size:13px}
+.ghead h2{margin:0;font-size:15px;flex:1}
+.ghead .cnt{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.gwhy{padding:9px 16px;color:var(--muted);font-size:12.5px;background:#fcfdff;border-bottom:1px solid var(--line)}
+.gbody{padding:10px 12px}
+.group.collapsed .gbody,.group.collapsed .gwhy{display:none}
+.point{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;
+       display:grid;grid-template-columns:78px minmax(0,1fr) 108px;gap:11px;align-items:start}
+.point:hover{border-color:#c7d2fe}
+.point.pass{border-left:3px solid var(--ok)}.point.fail{border-left:3px solid var(--bad)}
+.point.running{border-left:3px solid var(--primary);background:var(--soft)}
+.point .pname{font-weight:700;font-size:13px;margin-bottom:2px}
+.point .pmeta{font-size:11.8px;color:var(--muted);line-height:1.55}
+.point .pmeta b{color:#475569;font-weight:600}
+.point .pright{text-align:right}
+.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:800}
+.badge.idle{background:#f1f5f9;color:var(--muted)}
+.badge.run{background:var(--soft);color:var(--primary)}
+.badge.pass{background:var(--ok-bg);color:var(--ok)}
+.badge.fail{background:var(--bad-bg);color:var(--bad)}
+.pconc{font-size:11.5px;color:#475569;margin-top:6px;word-break:break-word;text-align:left}
+.pms{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;margin-top:3px}
+.link{color:var(--primary);cursor:pointer;font-size:11.5px;text-decoration:underline}
+.console{position:sticky;top:14px;background:#0b1220;border-radius:13px;overflow:hidden;
+         border:1px solid #1e293b;box-shadow:0 10px 30px rgba(2,6,23,.18)}
+.chead{display:flex;align-items:center;gap:9px;padding:11px 14px;background:#111c30;border-bottom:1px solid #1e293b;flex-wrap:wrap}
+.chead h2{margin:0;font-size:13.5px;color:#e2e8f0;flex:1;font-weight:700}
+.chead button{background:#1e293b;border-color:#334155;color:#cbd5e1;padding:4px 10px;font-size:11.5px}
+.chead button:hover:not(:disabled){background:#334155;color:#fff;border-color:#475569}
+.chead button.on{background:var(--primary);border-color:var(--primary);color:#fff}
+.cbody{height:calc(100vh - 210px);min-height:420px;overflow-y:auto;padding:10px 13px 18px;
+       font-family:Consolas,"Cascadia Code","Microsoft YaHei",monospace;font-size:12px}
+.cempty{color:#64748b;padding:18px 4px;line-height:1.9}
+.block{border:1px solid #1e293b;border-radius:9px;margin-bottom:10px;background:#0f1a2c;overflow:hidden}
+.bhead{display:flex;align-items:center;gap:9px;padding:8px 11px;background:#16243b;border-bottom:1px solid #1e293b}
+.bhead .bn{color:#e2e8f0;font-weight:700;flex:1;word-break:break-all}
+.bhead .bt{color:#94a3b8;font-size:11px;font-variant-numeric:tabular-nums}
+.bhead .bid{color:#64748b;font-size:11px}
+.block.fail .bhead{background:#2a1620;border-bottom-color:#7f1d1d}
+.bline{display:flex;gap:9px;padding:3px 11px;align-items:flex-start;line-height:1.65}
+.bline:hover{background:rgba(148,163,184,.06)}
+.ts{color:#475569;flex:none;width:62px}
+.lv{flex:none;width:38px;font-weight:700;text-align:center;border-radius:4px;font-size:11px;padding:0 2px}
+.msg{flex:1;color:#cbd5e1;word-break:break-word;white-space:pre-wrap}
+.lv-target{color:#f8fafc;background:#334155}.lv-note{color:#94a3b8;background:#1e293b}
+.lv-method{color:#67e8f9;background:#164e63}.lv-observe{color:#93c5fd;background:#1e3a8a}
+.lv-criteria{color:#fcd34d;background:#78350f}.lv-pass{color:#6ee7b7;background:#065f46}
+.lv-fail{color:#fca5a5;background:#7f1d1d}.lv-error{color:#fecaca;background:#991b1b}
+.bline.lv-pass .msg{color:#a7f3d0}.bline.lv-fail .msg,.bline.lv-error .msg{color:#fecaca}
+.bline.lv-method .msg{color:#a5f3fc}.bline.lv-observe .msg{color:#bfdbfe}
+.bline.lv-criteria .msg{color:#fde68a}
+.stat{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-top:8px}
+.stat b{color:var(--text);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:10px 0}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap">
+  <div>
+    <h1>分步验收台 · 按流程逐点测试</h1>
+    <p>每个按钮只测一个点，按钮旁写明「测什么 / 怎么测 / 期望」；右侧日志逐行给出 目标 → 方法 → 实测 → 判据 → 结论。</p>
+  </div>
+  <div class="tpills" id="tpills"><span class="tpill">正在读取状态…</span></div>
+</div></div>
+
+<div class="main">
+  <div class="card">
+    <div class="bar">
+      <button class="primary" id="btnSmoke">快速冒烟（每组首点）</button>
+      <button id="btnRegress">回归测试（含五步实跑）</button>
+      <button id="btnAll">全部顺序执行</button>
+      <button class="danger" id="btnStop" disabled>停止批量</button>
+      <button id="btnRefresh">刷新目录</button>
+      <button id="btnClear">清空日志</button>
+      <button id="btnExport">导出日志</button>
+      <button id="btnOnlyFail">仅看失败</button>
+    </div>
+    <div class="progress" id="progress">就绪：点任意「运行」按钮开始，或先点快速冒烟。</div>
+    <div class="stat" id="stat"></div>
+  </div>
+
+  <div class="card" style="padding:12px 14px">
+    <div class="muted" style="font-size:12px;margin-bottom:8px">项目流程顺序（点击定位到该阶段）</div>
+    <div class="steps" id="steps"></div>
+  </div>
+
+  <div class="grid">
+    <div id="groups"><div class="card muted">正在加载测试点目录…</div></div>
+    <div class="console">
+      <div class="chead">
+        <h2>执行日志</h2>
+        <span id="logCount" style="color:#94a3b8;font-size:11.5px">0 条</span>
+        <button id="btnScroll" class="on">自动滚动</button>
+        <button id="btnCollapse">折叠日志</button>
+      </div>
+      <div class="cbody" id="logBody"><div class="cempty">尚未执行任何测试点。<br>点左侧任意「运行」按钮，这里会逐行显示：目标 / 说明 / 方法 / 实测 / 判据 / 结论。</div></div>
+    </div>
+  </div>
+  <footer>分步验收台 8771 · 原有 8765~8769 独立页面与 8770 一体化控制台保持不变</footer>
+</div>
+
+<script>
+const S = {catalog:null, meta:{}, results:{}, blocks:[], running:false, stop:false,
+           onlyFail:false, autoScroll:true, collapsed:false, seq:0};
+const $ = id => document.getElementById(id);
+const esc = v => String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function api(path, payload){
+  const opt = payload===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)};
+  const r = await fetch(path,opt); return await r.json();
+}
+function progress(t){ $('progress').textContent=t; }
+function nameOf(id){ return (S.meta[id]&&S.meta[id].name)||id; }
+
+async function loadCatalog(refresh){
+  const c = await api('/api/catalog'+(refresh?'?refresh=1':''));
+  S.catalog=c; S.meta={};
+  c.groups.forEach(g=>g.points.forEach(p=>S.meta[p.id]=p));
+  renderSteps(); renderGroups(); updateStat();
+  if(!c.complete) progress('目录不完整：有阶段的报告暂时读不到，请确认数据库已启动后点「刷新目录」。');
+  try{ const st=await api('/api/status');
+    $('tpills').innerHTML = `<span class="tpill">PG ${st.db_ok?'已连接':'断开'}</span>`+
+      `<span class="tpill">Ollama ${st.ollama_ok?'可用':'不可用'}</span>`+
+      `<span class="tpill">档位 ${esc(st.mode||'—')}</span>`+
+      `<span class="tpill">线上派单 ${st.online_assignments??'—'} 行</span>`+
+      `<span class="tpill">测试点 ${c.total} 个</span>`+
+      `<span class="tpill">报告 ${st.reports??'—'} 份</span>`;
+  }catch(e){ $('tpills').innerHTML='<span class="tpill">状态读取失败</span>'; }
+}
+function renderSteps(){
+  $('steps').innerHTML = S.catalog.groups.map(g=>
+    `<div class="step" data-g="${esc(g.key)}"><b>${esc(g.no)}</b>${esc(g.title)} · ${g.points.length}</div>`).join('');
+  $('steps').querySelectorAll('[data-g]').forEach(el=>el.onclick=()=>{
+    const target=document.getElementById('group-'+el.dataset.g);
+    if(target){ target.scrollIntoView({behavior:'smooth',block:'start'});
+      const box=target.closest('.group'); if(box) box.classList.remove('collapsed'); }
+  });
+}
+function pointHtml(p,i){
+  const r=S.results[p.id];
+  const state=r?(r.passed?'pass':'fail'):'idle';
+  const badge=r?(r.passed?'PASS':'FAIL'):'未运行';
+  return `<div class="point ${state}" id="pt-${esc(p.id)}" data-id="${esc(p.id)}">
+    <div><button class="sm runbtn" data-run="${esc(p.id)}">运行</button>
+      <div class="pms" style="text-align:center;margin-top:5px">#${String(i+1).padStart(2,'0')}</div></div>
+    <div>
+      <div class="pname">${esc(p.name)}</div>
+      <div class="pmeta"><b>测什么：</b>${esc(p.what)}</div>
+      <div class="pmeta"><b>怎么测：</b>${esc(p.how)}</div>
+      <div class="pmeta"><b>期望：</b>${esc(p.expect)}　<span class="muted">[${p.kind==='live'?'实时执行':'报告重算'}]</span></div>
+      <div class="pconc" id="conc-${esc(p.id)}">${r?esc(r.conclusion||''):''}</div>
+      ${r?`<span class="link" data-log="${esc(p.id)}">查看日志 ↓</span>`:''}
+    </div>
+    <div class="pright"><span class="badge ${state}" id="badge-${esc(p.id)}">${badge}</span>
+      <div class="pms" id="ms-${esc(p.id)}">${r?r.elapsed_ms+' ms':''}</div></div>
+  </div>`;
+}
+function renderGroups(){
+  $('groups').innerHTML = S.catalog.groups.map(g=>
+    `<div class="group" id="group-${esc(g.key)}">
+      <div class="ghead" data-toggle="${esc(g.key)}">
+        <span class="gno">${esc(g.no)}</span>
+        <h2>${esc(g.title)}</h2>
+        <span class="cnt" id="cnt-${esc(g.key)}">${g.points.length} 个测试点</span>
+        <button class="sm" data-group="${esc(g.key)}">运行本组</button>
+      </div>
+      <div class="gwhy">${esc(g.why)}</div>
+      <div class="gbody">${g.points.map(pointHtml).join('')}</div>
+    </div>`).join('');
+  $('groups').querySelectorAll('[data-toggle]').forEach(el=>el.onclick=ev=>{
+    if(ev.target.closest('button'))return;
+    el.parentElement.classList.toggle('collapsed');
+  });
+  $('groups').querySelectorAll('[data-run]').forEach(el=>el.onclick=()=>runOne(el.dataset.run));
+  $('groups').querySelectorAll('[data-group]').forEach(el=>el.onclick=()=>{
+    const g=S.catalog.groups.find(x=>x.key===el.dataset.group);
+    runSequence(g.points.map(p=>p.id), '本阶段：'+g.title);
+  });
+  $('groups').querySelectorAll('[data-log]').forEach(el=>el.onclick=()=>focusLog(el.dataset.log));
+  updateGroupCounts();
+}
+function updateGroupCounts(){
+  S.catalog.groups.forEach(g=>{
+    const done=g.points.filter(p=>S.results[p.id]).length;
+    const pass=g.points.filter(p=>S.results[p.id]&&S.results[p.id].passed).length;
+    const el=$('cnt-'+g.key); if(el) el.textContent=`${done}/${g.points.length} 已跑 · ${pass} 通过`;
+  });
+}
+function setCard(id, state){
+  const box=$('pt-'+id); if(!box)return;
+  box.className='point '+(state==='run'?'running':state);
+  const b=$('badge-'+id); if(b){ b.className='badge '+(state==='run'?'run':state);
+    b.textContent=state==='run'?'运行中':(state==='pass'?'PASS':'FAIL'); }
+  const btn=box.querySelector('[data-run]'); if(btn){btn.disabled=state==='run';btn.textContent=state==='run'?'…':'重跑';}
+}
+function lineHtml(l){
+  return `<div class="bline lv-${esc(l.level)}"><span class="ts">${esc(l.time)}</span>`+
+         `<span class="lv lv-${esc(l.level)}">${esc(l.label)}</span>`+
+         `<span class="msg">${esc(l.msg)}</span></div>`;
+}
+function blockHtml(r, idx){
+  return `<div class="block ${r.passed?'':'fail'}" id="blk-${esc(r.id)}-${idx}">
+    <div class="bhead"><span class="badge ${r.passed?'pass':'fail'}">${r.passed?'PASS':'FAIL'}</span>
+      <span class="bn">${esc(r.name||r.id)}</span>
+      <span class="bid">${esc(r.id)}</span><span class="bt">${esc(r.elapsed_ms)} ms</span></div>
+    <div class="blines">${(r.logs||[]).map(lineHtml).join('')}</div></div>`;
+}
+function visible(r){ return !S.onlyFail || !r.passed; }
+function renderLogs(){
+  const body=$('logBody');
+  const list=S.blocks.filter(visible);
+  body.innerHTML = list.length? list.map((x,i)=>blockHtml(x,i)).join('')
+    : '<div class="cempty">没有可显示的日志。<br>点左侧「运行」按钮，或关闭「仅看失败」筛选。</div>';
+  $('logCount').textContent=S.blocks.length+' 条';
+  if(S.autoScroll) body.scrollTop=body.scrollHeight;
+}
+function appendLog(r){
+  S.blocks.push(r); $('logCount').textContent=S.blocks.length+' 条';
+  if(visible(r)){
+    const empty=$('logBody').querySelector('.cempty'); if(empty) empty.remove();
+    $('logBody').insertAdjacentHTML('beforeend',blockHtml(r,S.blocks.length-1));
+    if(S.autoScroll) $('logBody').scrollTop=$('logBody').scrollHeight;
+  }
+  const id=r.id, conc=$('conc-'+id); if(conc) conc.textContent=r.conclusion||'';
+  const ms=$('ms-'+id); if(ms) ms.textContent=r.elapsed_ms+' ms';
+  if(!$('pt-'+id).querySelector('[data-log]')){
+    const box=$('pt-'+id).querySelector('.pconc');
+    if(box) box.insertAdjacentHTML('afterend',`<span class="link" data-log="${esc(id)}">查看日志 ↓</span>`);
+    const link=$('pt-'+id).querySelector('[data-log]'); if(link) link.onclick=()=>focusLog(id);
+  }
+}
+function focusLog(id){
+  const idx=S.blocks.map(b=>b.id).lastIndexOf(id);
+  if(idx<0)return;
+  if(S.onlyFail&&S.blocks[idx].passed){ S.onlyFail=false; $('btnOnlyFail').classList.remove('on'); renderLogs(); }
+  const el=$('blk-'+id+'-'+idx);
+  if(el){ el.scrollIntoView({behavior:'smooth',block:'center'});
+    el.style.outline='2px solid #4f46e5'; setTimeout(()=>el.style.outline='',1600); }
+}
+function updateStat(){
+  const ids=Object.keys(S.results), pass=ids.filter(k=>S.results[k].passed).length;
+  $('stat').innerHTML=`已运行 <b>${ids.length}</b> / ${S.catalog?S.catalog.total:0}　通过 <b style="color:var(--ok)">${pass}</b>　未通过 <b style="color:var(--bad)">${ids.length-pass}</b>　日志 <b>${S.blocks.length}</b> 条`;
+  updateGroupCounts();
+}
+async function runOne(id){
+  setCard(id,'run');
+  let r;
+  try{ r=await api('/api/run',{id}); }
+  catch(e){ r={id,name:nameOf(id),passed:false,conclusion:'请求失败：'+e.message,elapsed_ms:0,
+               logs:[{time:'--:--:--',level:'error',label:'异常',msg:String(e.message||e)}]}; }
+  if(r.error&&!r.logs){ r={id,name:nameOf(id),passed:false,conclusion:'服务端错误：'+r.error,elapsed_ms:0,
+      logs:[{time:'--:--:--',level:'error',label:'异常',msg:r.error}]}; }
+  S.results[id]=r; setCard(id,r.passed?'pass':'fail'); appendLog(r); updateStat();
+  return r;
+}
+async function runSequence(ids,label){
+  if(S.running)return;
+  S.running=true; S.stop=false; $('btnStop').disabled=false;
+  for(let i=0;i<ids.length;i++){
+    if(S.stop)break;
+    progress(`正在执行 ${i+1}/${ids.length}：${nameOf(ids[i])}（${label}）`);
+    await runOne(ids[i]);
+  }
+  const done=Object.keys(S.results).length;
+  const fails=Object.values(S.results).filter(r=>!r.passed).length;
+  progress(`${S.stop?'已停止':'已完成'}：${label} · 共执行 ${ids.length} 个点 · 累计 ${done} 次运行 · 当前未通过 ${fails} 个`);
+  S.running=false; $('btnStop').disabled=true;
+}
+async function planRun(mode,label){
+  const p=await api('/api/plan',{mode}); runSequence(p.ids,label);
+}
+$('btnSmoke').onclick=()=>planRun('smoke','快速冒烟');
+$('btnRegress').onclick=()=>planRun('regress','回归测试');
+$('btnAll').onclick=()=>planRun('all','全部顺序执行');
+$('btnStop').onclick=()=>{S.stop=true;progress('已请求停止，当前测试点跑完后中止…');};
+$('btnRefresh').onclick=()=>loadCatalog(true);
+$('btnClear').onclick=()=>{S.blocks=[];renderLogs();progress('日志已清空（各测试点的最近结论仍保留）');};
+$('btnOnlyFail').onclick=()=>{S.onlyFail=!S.onlyFail;$('btnOnlyFail').classList.toggle('on',S.onlyFail);
+  $('btnOnlyFail').textContent=S.onlyFail?'显示全部':'仅看失败';renderLogs();};
+$('btnScroll').onclick=()=>{S.autoScroll=!S.autoScroll;$('btnScroll').classList.toggle('on',S.autoScroll);};
+$('btnCollapse').onclick=()=>{S.collapsed=!S.collapsed;
+  document.querySelectorAll('.blines').forEach(el=>el.style.display=S.collapsed?'none':'');
+  $('btnCollapse').textContent=S.collapsed?'展开日志':'折叠日志';};
+$('btnExport').onclick=()=>{
+  const lines=['分步验收台执行日志','导出时间：'+new Date().toLocaleString(),'='.repeat(70)];
+  S.blocks.forEach(r=>{
+    lines.push('',`[${r.passed?'PASS':'FAIL'}] ${r.id} ${r.name||''} (${r.elapsed_ms} ms)`);
+    (r.logs||[]).forEach(l=>lines.push(`  ${l.time} [${l.label}] ${l.msg}`));
+  });
+  const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='验收日志_'+new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')+'.txt';
+  a.click(); URL.revokeObjectURL(a.href);
+};
+(async()=>{ try{ await loadCatalog(false); }catch(e){ progress('目录加载失败：'+e.message); } })();
+</script>
+</body>
+</html>

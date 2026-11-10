@@ -1,0 +1,206 @@
+{
+  "generated_at": "2026-11-10T07:50:06",
+  "modes": [
+    {
+      "mode": "shadow",
+      "label": "影子模式（只记录不生效）"
+    },
+    {
+      "mode": "assist",
+      "label": "辅助模式（人确认后生效）"
+    },
+    {
+      "mode": "auto",
+      "label": "自动模式（仅高置信度低风险生效）"
+    }
+  ],
+  "timeline": [
+    {
+      "mode": "shadow",
+      "label": "影子模式（只记录不生效）",
+      "tickets": 12,
+      "applied": false,
+      "log_rows": 36,
+      "auto_rows": 0,
+      "feedback_rows": 0,
+      "low_confidence": 2,
+      "abstains": 3,
+      "degraded": 2
+    },
+    {
+      "mode": "assist",
+      "label": "辅助模式（人确认后生效）",
+      "tickets": 12,
+      "applied": false,
+      "log_rows": 36,
+      "auto_rows": 0,
+      "feedback_rows": 6,
+      "low_confidence": 0,
+      "abstains": 2,
+      "degraded": 0
+    },
+    {
+      "mode": "auto",
+      "label": "自动模式（仅高置信度低风险生效）",
+      "tickets": 12,
+      "applied": true,
+      "log_rows": 36,
+      "auto_rows": 11,
+      "feedback_rows": 0,
+      "low_confidence": 1,
+      "abstains": 3,
+      "degraded": 1
+    }
+  ],
+  "rollback_demo": {
+    "kill_switch": "on",
+    "auto_allowed": false,
+    "reason": "回退开关已打开：自动模式被拒绝，强制回退到影子模式",
+    "mode_after": "shadow",
+    "passed": true
+  },
+  "drift": {
+    "current": {
+      "low_confidence_rate": 0.0833,
+      "retrieval_abstain_rate": 0.2222,
+      "routing_degraded_rate": 0.0833,
+      "human_override_rate": 0.5,
+      "decision_rows": 108
+    },
+    "current_alert": true,
+    "current_reasons": "human_override_rate 0.5 > 0.35",
+    "simulated": {
+      "low_confidence_rate": 0.0833,
+      "retrieval_abstain_rate": 0.95,
+      "routing_degraded_rate": 0.0833,
+      "human_override_rate": 0.5,
+      "decision_rows": 108
+    },
+    "simulated_alert": true,
+    "simulated_reasons": "retrieval_abstain_rate 0.95 > 0.6；human_override_rate 0.5 > 0.35",
+    "thresholds": {
+      "low_confidence_rate": 0.4,
+      "retrieval_abstain_rate": 0.6,
+      "routing_degraded_rate": 0.7,
+      "human_override_rate": 0.35
+    },
+    "note": "第二条快照是人为注入的漂移探针，只用于验证告警规则确实会触发"
+  },
+  "pii": {
+    "original": "Customer mail: hans.mueller@example.de, phone +49 170 1234567, invoice 202611091234 and IP 192.168.10.24.",
+    "redacted": "Customer mail: [EMAIL], phone [PHONE], invoice [NUMBER] and IP [IP].",
+    "email_removed": true,
+    "changed": true
+  },
+  "compliance": {
+    "dataset_license": "cc-by-nc-4.0",
+    "commercial_use": "禁止：仅够内部验证，真实生产必须更换数据源或取得授权",
+    "synthetic_data": "工程师、技能、排班均为造数；结论只说明流程跑通，不能当生产预期",
+    "pii": "真实工单含个人身份信息，入库前脱敏，并保留审计日志与访问控制",
+    "audit": "每次模型/规则变更记录版本、配置、评测分数与生效时间"
+  },
+  "audit": {
+    "by_mode_stage": [
+      {
+        "mode": "assist",
+        "stage": "retrieval",
+        "rows": 12,
+        "applied": 0
+      },
+      {
+        "mode": "assist",
+        "stage": "routing",
+        "rows": 12,
+        "applied": 0
+      },
+      {
+        "mode": "assist",
+        "stage": "triage",
+        "rows": 12,
+        "applied": 0
+      },
+      {
+        "mode": "auto",
+        "stage": "retrieval",
+        "rows": 12,
+        "applied": 12
+      },
+      {
+        "mode": "auto",
+        "stage": "routing",
+        "rows": 12,
+        "applied": 12
+      },
+      {
+        "mode": "auto",
+        "stage": "triage",
+        "rows": 12,
+        "applied": 12
+      },
+      {
+        "mode": "shadow",
+        "stage": "retrieval",
+        "rows": 12,
+        "applied": 0
+      },
+      {
+        "mode": "shadow",
+        "stage": "routing",
+        "rows": 12,
+        "applied": 0
+      },
+      {
+        "mode": "shadow",
+        "stage": "triage",
+        "rows": 12,
+        "applied": 0
+      }
+    ],
+    "feedback_total": 12,
+    "label_pool_size": 3,
+    "test_leaked_into_pool": 0,
+    "auto_assignment_rows": 11,
+    "drift_snapshots": 2,
+    "online_assignments_rows": 0,
+    "split_counts": {
+      "test": 2858,
+      "train": 22871,
+      "val": 2858
+    }
+  },
+  "frozen_baseline": {
+    "source": "baseline_metrics.json",
+    "split_counts": {
+      "test": 2858,
+      "train": 22871,
+      "val": 2858
+    },
+    "routing_timeout_rate": 0.212
+  },
+  "state": {
+    "mode": "shadow",
+    "label": "影子模式（只记录不生效）",
+    "kill_switch": "off",
+    "kill_switch_on": false,
+    "allowed_modes": [
+      "shadow",
+      "assist",
+      "auto"
+    ]
+  },
+  "isolation": {
+    "tables": [
+      "lifecycle_config",
+      "decision_log",
+      "feedback_events",
+      "drift_snapshots",
+      "auto_assignments"
+    ],
+    "note": "自动档的「上线派单」写在沙盒表 auto_assignments，不写线上 assignments，也不碰前四步的回放数据，以便随时回归前四步验收页"
+  },
+  "known_limits": [
+    "三档演练用的是冻结 test 工单做只读回放，只验证流程，不代表真实线上流量。",
+    "回流标注只进 train；test 样本只作观察，绝不进训练池，也不重新训练。",
+    "尚未接真实排班、真实工单与 A/B 分流，影子模式未跑满真实业务周期。"
+  ]
+}

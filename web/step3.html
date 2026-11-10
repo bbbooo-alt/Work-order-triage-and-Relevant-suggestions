@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第三步验收 · 解决建议</title>
+<style>
+  :root{
+    --bg:#f6faf9; --card:#fff; --text:#1f2937; --muted:#6b7280;
+    --line:#e5e7eb; --primary:#0d9488; --primary-dark:#0f766e;
+    --ok:#16a34a; --ok-bg:#f0fdf4; --bad:#dc2626; --bad-bg:#fef2f2;
+    --warn:#b45309; --warn-bg:#fffbeb;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+       font-family:"Microsoft YaHei","PingFang SC",system-ui,-apple-system,sans-serif;
+       font-size:15px;line-height:1.6}
+  .wrap{max-width:1040px;margin:0 auto;padding:28px 20px 60px}
+  header h1{margin:0 0 6px;font-size:26px}
+  header p{margin:0;color:var(--muted)}
+  .tip{background:#f0fdfa;border:1px solid #99f6e4;border-radius:10px;
+       padding:14px 18px;margin:20px 0;color:#134e4a}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+        padding:20px 22px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .card h2{font-size:18px;margin:0 0 14px}
+  .btns{display:flex;flex-wrap:wrap;gap:10px}
+  button{font:inherit;cursor:pointer;border-radius:9px;padding:11px 20px;border:1px solid var(--line);
+         background:#fff;color:var(--text);transition:.15s}
+  button:hover:not(:disabled){border-color:var(--primary);color:var(--primary)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .primary{background:var(--primary);color:#fff;border-color:var(--primary);
+           font-weight:600;font-size:16px;padding:13px 28px}
+  .primary:hover:not(:disabled){background:var(--primary-dark);color:#fff;border-color:var(--primary-dark)}
+  .busy{margin-top:12px;color:var(--primary);font-weight:600;display:none}
+  .err{background:var(--bad-bg);border:1px solid #fecaca;color:#991b1b;
+       padding:12px 16px;border-radius:9px;margin-top:14px;white-space:pre-wrap;display:none}
+  .overview{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .score{font-size:40px;font-weight:700;line-height:1}
+  .badge{padding:6px 16px;border-radius:999px;font-weight:600}
+  .badge.ok{background:var(--ok-bg);color:var(--ok);border:1px solid #bbf7d0}
+  .badge.bad{background:var(--bad-bg);color:var(--bad);border:1px solid #fecaca}
+  .check{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .check:last-child{border-bottom:none}
+  .dot{width:10px;height:10px;border-radius:50%;margin-top:7px;flex:none}
+  .check.ok .dot{background:var(--ok)} .check.bad .dot{background:var(--bad)}
+  .check b{font-weight:600}
+  .check .detail{color:var(--muted);font-size:13px;margin-top:2px;word-break:break-all}
+  .tag{margin-left:auto;flex:none;font-size:13px;font-weight:600}
+  .check.ok .tag{color:var(--ok)} .check.bad .tag{color:var(--bad)}
+  .nums{display:flex;gap:12px;flex-wrap:wrap}
+  .num{flex:1;min-width:135px;background:#f7fbfa;border:1px solid var(--line);
+       border-radius:10px;padding:14px}
+  .num .k{color:var(--muted);font-size:13px}
+  .num .v{font-size:22px;font-weight:700;margin-top:2px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left}
+  th{color:var(--muted);font-weight:600;background:#f7fbfa}
+  td.n{font-variant-numeric:tabular-nums;font-weight:600}
+  tr.hi td{background:#f0fdfa}
+  .muted{color:var(--muted);font-size:13px}
+  .hidden{display:none}
+  textarea,select{font:inherit;width:100%;padding:10px 12px;border:1px solid var(--line);
+                  border-radius:9px;background:#fff;color:var(--text)}
+  textarea{min-height:88px;resize:vertical}
+  .formrow{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+  .formrow > div{flex:1;min-width:180px}
+  .formrow label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+  .notice{padding:12px 16px;border-radius:9px;margin:14px 0;font-weight:600}
+  .notice.ok{background:var(--ok-bg);color:#166534;border:1px solid #bbf7d0}
+  .notice.warn{background:var(--warn-bg);color:var(--warn);border:1px solid #fde68a}
+  .hit{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#fcfefd}
+  .hit .meta{font-size:13px;color:var(--muted);margin-bottom:6px}
+  .hit .txt{font-size:14px;word-break:break-word}
+  .pill{display:inline-block;padding:1px 9px;border-radius:999px;background:#ccfbf1;
+        color:#115e59;font-size:12px;font-weight:600;margin-right:6px}
+  .banner{padding:12px 16px;border-radius:9px;margin:12px 0;font-size:14px}
+  .banner.warn{background:var(--warn-bg);border:1px solid #fde68a;color:#92400e}
+  .banner.ok{background:var(--ok-bg);border:1px solid #bbf7d0;color:#166534}
+  footer{color:var(--muted);font-size:13px;margin-top:24px;line-height:1.9}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>第三步验收 · 解决建议</h1>
+    <p>知识语料 ＋ 混合检索 ＋ 拒答 · 独立验收页面（端口 8767，与 8765 / 8766 完全分开）</p>
+  </header>
+
+  <div class="tip">
+    这一步给工单<b>找可参考的解决片段</b>：补充权威知识文档，用向量与关键词两路召回，
+    用一份黄金评测集量化 Recall@5 / MRR，并让系统在没把握时<b>拒答转人工</b>。
+    本阶段<b>只检索、不生成</b>，不调用大模型写答案。点大按钮即可自动完成，首次验收需等待嵌入服务启动。
+  </div>
+
+  <div class="card">
+    <h2>操作</h2>
+    <div class="btns">
+      <button class="primary" id="btnAll">一键验收第三步（推荐）</button>
+      <button id="btnCorpus">只重新核对语料</button>
+      <button id="btnEvaluate">只重新评测指标</button>
+      <button id="btnStatus">刷新状态</button>
+    </div>
+    <div class="busy" id="busy">正在执行，请稍候…</div>
+    <div class="err" id="err"></div>
+  </div>
+
+  <div class="card">
+    <h2>当前状态</h2>
+    <div id="status" class="muted">正在读取…</div>
+  </div>
+
+  <div class="card">
+    <h2>亲手试一次：输入问题，看看系统给什么建议</h2>
+    <div class="muted">这里调用的是真实的检索链路。可以换文字、换检索方式、换关键词权重，直观看到差别。</div>
+    <textarea id="query" placeholder="输入一段故障描述…">VPN connection keeps dropping on the office router after a firmware update. DNS and routing tables look normal, Wi-Fi clients report authentication errors. Please check recent network configuration changes.</textarea>
+    <div class="formrow">
+      <div><label>检索方式</label>
+        <select id="mode">
+          <option value="hybrid">混合检索（向量 + 关键词）</option>
+          <option value="vector">纯向量</option>
+          <option value="keyword">纯关键词</option>
+        </select>
+      </div>
+      <div><label>关键词权重（默认＝系统验收时选出的值）</label>
+        <select id="weight">
+          <option value="default">跟随系统默认</option>
+          <option value="0">0（关闭融合）</option>
+          <option value="0.3">0.3</option>
+          <option value="0.6">0.6</option>
+          <option value="0.9">0.9（强融合）</option>
+        </select>
+      </div>
+    </div>
+    <div class="btns" style="margin-top:12px">
+      <button class="primary" id="btnTry">试着查一下</button>
+      <button id="btnNonsense">填一段无关问题（测拒答）</button>
+    </div>
+    <div id="tryResult" class="hidden" style="margin-top:16px"></div>
+  </div>
+
+  <div class="card hidden" id="resultCard">
+    <h2>验收结果</h2>
+    <div class="overview">
+      <div class="score" id="score">0 / 0</div>
+      <div>
+        <span class="badge" id="badge">未运行</span>
+        <div class="muted" id="resultHint"></div>
+      </div>
+    </div>
+    <div id="checks" style="margin-top:14px"></div>
+  </div>
+
+  <div class="card hidden" id="dataCard">
+    <h2>关键数字</h2>
+    <div class="muted" style="margin-bottom:8px">检索质量（在 30 条不参与调参的评测子集上；越高越好，平均排名越低越好）</div>
+    <table>
+      <thead><tr><th>检索方式</th><th>Recall@5</th><th>MRR</th><th>正确文档平均排名</th><th>拒答率</th></tr></thead>
+      <tbody id="metricRows"></tbody>
+    </table>
+
+    <div class="muted" style="margin:20px 0 8px">关键词权重是怎么选出来的（前 20 条验证子集）</div>
+    <table>
+      <thead><tr><th>权重</th><th>验证集 MRR</th><th>验证集 Recall@5</th><th>平均排名</th><th>结果</th></tr></thead>
+      <tbody id="tuneRows"></tbody>
+    </table>
+    <div id="guardBanner"></div>
+
+    <div class="muted" style="margin:20px 0 8px">拒答阈值校准：为什么不用「相似度低于某值就拒答」</div>
+    <div id="calibration" class="muted"></div>
+    <table style="margin-top:10px">
+      <thead><tr><th>无关查询探针</th><th>是否拒答</th><th>词面重合数</th><th>最高相似度</th></tr></thead>
+      <tbody id="probeRows"></tbody>
+    </table>
+
+    <div class="muted" style="margin:20px 0 10px">知识库构成与已知限制</div>
+    <div id="corpusInfo" class="muted"></div>
+  </div>
+
+  <footer>
+    <div><b>这些检查在验什么（大白话）</b></div>
+    <div>1. 前两步的报告、真值表、线上派单表有没有被本步写脏；本步是否用了自己独立的端口与报告文件。</div>
+    <div>2. 知识库是否同时有客服回复、工单正文、权威知识文档三类内容，索引是否齐备。</div>
+    <div>3. 有没有一份可复用的黄金评测集；检索质量是否用同一把尺子量化，而不是「看着好像挺准」。</div>
+    <div>4. 关键词通道是否真的工作（长文本直接做 AND 查询会一条都命中不了），权重是否由验证子集决定。</div>
+    <div>5. 验证集挑出来的配置若在隔离评测集上变差，是否会自动退回更稳的方案（上线护栏）。</div>
+    <div>6. 无关问题能否被拦住；拒答条件是不是经过实测校准，而不是拍脑袋写一个相似度阈值。</div>
+    <div style="margin-top:10px">本页只验收第三步。确认通过后，才会开始第四步（路由到工程师）。</div>
+  </footer>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function busy(on, text) {
+  $('#busy').style.display = on ? 'block' : 'none';
+  if (text) $('#busy').textContent = text;
+  document.querySelectorAll('button').forEach(b => b.disabled = on);
+}
+function showError(msg) {
+  const e = $('#err');
+  e.style.display = msg ? 'block' : 'none';
+  e.textContent = msg || '';
+}
+async function get(url) { const r = await fetch(url); return r.json(); }
+async function post(url, payload) {
+  const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'},
+                              body: payload ? JSON.stringify(payload) : undefined});
+  return r.json();
+}
+
+async function refreshStatus() {
+  try {
+    const s = await get('/api/status');
+    if (!s.db_ok) { $('#status').innerHTML = `<span style="color:var(--bad)">数据库未连接：${esc(s.error)}</span>`; return; }
+    const c = s.corpus || {};
+    $('#status').innerHTML =
+      `数据库连接正常 · 工单 ${s.tickets} 行 · 知识库 answer ${c.answer||0} / body ${c.body||0} / kb ${c.kb||0} 条<br>` +
+      `嵌入服务 Ollama ${s.ollama_ok ? '已就绪' : '未启动（点一键验收会自动拉起）'} · ` +
+      `第一步报告 ${s.step1_report_exists?'完好':'缺失'} · 第二步报告 ${s.step2_report_exists?'完好':'缺失'} · ` +
+      `第三步报告 ${s.step3_report_exists?'已生成':'未生成'}<br>` +
+      `线上派单表 ${s.assignments_rows} 行 · 本页端口 ${s.port}`;
+  } catch (e) { $('#status').textContent = '读取状态失败：' + e; }
+}
+
+function render(data) {
+  showError(data.error ? ('执行出错：' + data.error + (data.trace ? '\n\n' + data.trace : '')) : '');
+  const checks = data.checks || [];
+  if (!checks.length) return;
+  const passed = checks.filter(c => c.passed).length;
+  $('#resultCard').classList.remove('hidden');
+  $('#score').textContent = passed + ' / ' + checks.length;
+  const badge = $('#badge');
+  badge.textContent = data.ok ? '全部通过' : '未通过';
+  badge.className = 'badge ' + (data.ok ? 'ok' : 'bad');
+  $('#resultHint').textContent = data.ok
+    ? '第三步已完成，可以进入第四步（路由到工程师）。'
+    : '请查看下面未通过的检查项。';
+  $('#checks').innerHTML = checks.map(c =>
+    `<div class="check ${c.passed?'ok':'bad'}"><span class="dot"></span>
+       <div><b>${esc(c.name)}</b><div class="detail">${esc(c.detail)}</div></div>
+       <span class="tag">${c.passed?'通过':'未通过'}</span></div>`).join('');
+  if (data.report) renderReport(data.report);
+}
+
+function renderReport(rep) {
+  $('#dataCard').classList.remove('hidden');
+  const m = rep.retrieval || {};
+  const row = (label, key, hi) => {
+    const e = m[key];
+    if (!e) return `<tr><td>${esc(label)}</td><td colspan="4">无数据</td></tr>`;
+    return `<tr class="${hi?'hi':''}"><td>${esc(label)}</td><td class="n">${e.recall_at_5}</td>` +
+           `<td class="n">${e.mrr}</td><td class="n">${e.mean_correct_kb_rank}</td>` +
+           `<td class="n">${e.abstain_rate}</td></tr>`;
+  };
+  $('#metricRows').innerHTML = row('纯向量', 'vector', false) + row('混合检索（最终生效配置）', 'hybrid', true);
+
+  const t = rep.keyword_tuning || {}, cands = t.candidates || {};
+  $('#tuneRows').innerHTML = Object.entries(cands).map(([w, v]) => {
+    const marks = [];
+    if (Number(w) === Number(t.validation_selected)) marks.push('验证集选中');
+    if (Number(w) === Number(t.final_weight)) marks.push('最终生效');
+    return `<tr class="${Number(w)===Number(t.final_weight)?'hi':''}"><td class="n">${esc(w)}</td>` +
+           `<td class="n">${v.mrr}</td><td class="n">${v.recall_at_5}</td>` +
+           `<td class="n">${v.mean_correct_kb_rank}</td><td>${esc(marks.join('、')||'-')}</td></tr>`;
+  }).join('');
+  $('#guardBanner').innerHTML = t.guard_triggered
+    ? `<div class="banner warn"><b>上线护栏已触发</b>：验证集选出的权重 ${esc(t.validation_selected)} ` +
+      `在隔离评测子集上出现回退，系统自动降级为纯向量（权重 0）。${esc(t.note||'')}</div>`
+    : `<div class="banner ok"><b>上线护栏未触发</b>：验证集选出的权重 ${esc(t.final_weight)} 在评测子集上未出现回退。${esc(t.note||'')}</div>`;
+
+  const cal = rep.calibration || {};
+  const pos = cal.positive_best_kb_similarity || {}, neg = cal.negative_best_kb_similarity || {};
+  $('#calibration').innerHTML =
+    `相关工单最高相似度 ${esc(pos.min??'-')} ~ ${esc(pos.max??'-')}（中位数 ${esc(pos.median??'-')}）；` +
+    `无关查询 ${esc(neg.min??'-')} ~ ${esc(neg.max??'-')}。<b>两组分布重叠</b>，说明绝对相似度阈值不可靠。<br>` +
+    `${esc(cal.conclusion||'')}<br>` +
+    `当前可答条件：查询实词与权威知识文档的词面重合数 >= ${esc((rep.abstain_policy||{}).min_lexical_overlap ?? '-')}，` +
+    `且相似度不低于 ${esc((rep.abstain_policy||{}).similarity_floor ?? '-')}。`;
+  $('#probeRows').innerHTML = (rep.abstain_probes || []).map(p =>
+    `<tr><td>${esc(p.query)}</td><td class="n">${p.triggered?'已拒答':'未拒答'}</td>` +
+    `<td class="n">${p.lexical_overlap}</td><td class="n">${p.best_similarity}</td></tr>`).join('');
+
+  const c = rep.corpus || {}, g = rep.golden_set || {};
+  $('#corpusInfo').innerHTML =
+    `语料：answer ${esc(c.answer||0)} 条（历史客服回复）、body ${esc(c.body||0)} 条（确定性抽样的工单正文）、` +
+    `kb ${esc(c.kb||0)} 条（12 个技能域各一份权威排查步骤）。索引：${esc((rep.indexes||[]).join('、'))}。<br>` +
+    `黄金集 ${esc(g.size||0)} 条，${esc(g.label_type||'-')}：${esc(g.note||'')}<br>` +
+    `向量：${esc((rep.embedding||{}).model||'-')} 原生 ${esc((rep.embedding||{}).native_dim||'-')} 维，` +
+    `截断存 ${esc((rep.embedding||{}).stored_dim||'-')} 维（pgvector HNSW 索引的维度上限所致）。<br>` +
+    `<b>已知限制</b>：知识文档目前只有英文，德文工单词面重合低，会被保守地转人工；` +
+    `本阶段只返回原文片段、不做生成，也不做人工逐条标注。`;
+}
+
+function renderTry(result) {
+  const box = $('#tryResult');
+  box.classList.remove('hidden');
+  box.innerHTML =
+    `<div class="notice ${result.abstain?'warn':'ok'}">${esc(result.notice)}</div>` +
+    `<div class="nums">` +
+      `<div class="num"><div class="k">检索方式</div><div class="v">${esc(result.mode)}</div></div>` +
+      `<div class="num"><div class="k">关键词权重</div><div class="v">${esc(result.keyword_weight)}</div></div>` +
+      `<div class="num"><div class="k">词面重合数</div><div class="v">${esc(result.lexical_overlap)}</div></div>` +
+      `<div class="num"><div class="k">最高知识文档相似度</div><div class="v">${esc(result.best_kb_similarity)}</div></div>` +
+      `<div class="num"><div class="k">关键词命中数</div><div class="v">${esc(result.keyword_hits)}</div></div>` +
+    `</div>` +
+    `<div class="muted" style="margin:16px 0 8px">命中的原文片段（未经过大模型改写）</div>` +
+    (result.advice || []).map(h =>
+      `<div class="hit"><div class="meta"><span class="pill">第 ${h.rank} 条</span>` +
+      `${esc(h.source)} · 召回通道 ${esc(h.channels)} · 相似度 ${esc(h.similarity ?? '不适用')}</div>` +
+      `<div class="txt">${esc(h.text)}</div></div>`).join('') || '<div class="muted">没有命中任何片段。</div>';
+}
+
+async function runAll() {
+  busy(true, '正在灌语料、调权重并验收（约需一两分钟）：语料 → 黄金集 → 混合检索 → 拒答校准…');
+  showError('');
+  try {
+    const data = await post('/api/run_all');
+    render(data);
+    await refreshStatus();
+  } catch (e) { showError('请求失败：' + e); }
+  finally { busy(false); }
+}
+async function simple(url, label) {
+  busy(true, label + '，请稍候…');
+  showError('');
+  try {
+    const d = await post(url);
+    if (!d.ok) showError('执行出错：' + (d.error || '未知错误') + (d.trace ? '\n\n' + d.trace : ''));
+    else { $('#status').textContent = d.message + '（可点「一键验收第三步」查看完整结果）'; render(d); }
+    await refreshStatus();
+  } catch (e) { showError('请求失败：' + e); }
+  finally { busy(false); }
+}
+async function trySuggest() {
+  busy(true, '正在检索，请稍候…');
+  showError('');
+  try {
+    const d = await post('/api/suggest', {query: $('#query').value, mode: $('#mode').value, weight: $('#weight').value});
+    if (!d.ok) showError('检索出错：' + (d.error || '未知错误'));
+    else renderTry(d.result);
+  } catch (e) { showError('请求失败：' + e); }
+  finally { busy(false); }
+}
+
+$('#btnAll').onclick = runAll;
+$('#btnCorpus').onclick = () => simple('/api/corpus', '正在核对知识语料');
+$('#btnEvaluate').onclick = () => simple('/api/evaluate', '正在重新评测检索指标');
+$('#btnStatus').onclick = refreshStatus;
+$('#btnTry').onclick = trySuggest;
+$('#btnNonsense').onclick = () => {
+  $('#query').value = 'zzzqqq unrelated nonsense query no known terms';
+  $('#status').textContent = '已填入无关查询，点「试着查一下」应看到「建议转人工」。';
+};
+window.addEventListener('load', refreshStatus);
+</script>
+</body>
+</html>

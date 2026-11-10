@@ -1,0 +1,146 @@
+{
+  "generated_at": "2026-11-09T15:00:42",
+  "model_version": "triage-l1-v1",
+  "auto_conf_min": 0.85,
+  "target_priority_accuracy": 0.9,
+  "min_coverage": 0.05,
+  "qualified": false,
+  "chosen": {
+    "threshold": 0.85,
+    "coverage": 0.0038,
+    "priority_accuracy": 0.7273,
+    "three_task_accuracy": 0.7273
+  },
+  "val_rows": 2858,
+  "candidates": [
+    {
+      "threshold": 0.4,
+      "coverage": 0.9958,
+      "priority_accuracy": 0.5316,
+      "three_task_accuracy": 0.2112
+    },
+    {
+      "threshold": 0.45,
+      "coverage": 0.9587,
+      "priority_accuracy": 0.5347,
+      "three_task_accuracy": 0.215
+    },
+    {
+      "threshold": 0.5,
+      "coverage": 0.8523,
+      "priority_accuracy": 0.5468,
+      "three_task_accuracy": 0.2303
+    },
+    {
+      "threshold": 0.55,
+      "coverage": 0.6756,
+      "priority_accuracy": 0.5665,
+      "three_task_accuracy": 0.2584
+    },
+    {
+      "threshold": 0.6,
+      "coverage": 0.4419,
+      "priority_accuracy": 0.5962,
+      "three_task_accuracy": 0.3072
+    },
+    {
+      "threshold": 0.65,
+      "coverage": 0.2232,
+      "priority_accuracy": 0.6661,
+      "three_task_accuracy": 0.3966
+    },
+    {
+      "threshold": 0.7,
+      "coverage": 0.1102,
+      "priority_accuracy": 0.7111,
+      "three_task_accuracy": 0.4921
+    },
+    {
+      "threshold": 0.75,
+      "coverage": 0.0595,
+      "priority_accuracy": 0.7235,
+      "three_task_accuracy": 0.5294
+    },
+    {
+      "threshold": 0.8,
+      "coverage": 0.0217,
+      "priority_accuracy": 0.6774,
+      "three_task_accuracy": 0.5323
+    },
+    {
+      "threshold": 0.85,
+      "coverage": 0.0038,
+      "priority_accuracy": 0.7273,
+      "three_task_accuracy": 0.7273
+    },
+    {
+      "threshold": 0.9,
+      "coverage": 0.0,
+      "priority_accuracy": 0.0,
+      "three_task_accuracy": 0.0
+    }
+  ],
+  "reliability_bins": [
+    {
+      "bin": "0.0-0.1",
+      "count": 0,
+      "avg_confidence": 0,
+      "priority_accuracy": 0
+    },
+    {
+      "bin": "0.1-0.2",
+      "count": 0,
+      "avg_confidence": 0,
+      "priority_accuracy": 0
+    },
+    {
+      "bin": "0.2-0.3",
+      "count": 0,
+      "avg_confidence": 0,
+      "priority_accuracy": 0
+    },
+    {
+      "bin": "0.3-0.4",
+      "count": 12,
+      "avg_confidence": 0.3846,
+      "priority_accuracy": 0.4167
+    },
+    {
+      "bin": "0.4-0.5",
+      "count": 410,
+      "avg_confidence": 0.4653,
+      "priority_accuracy": 0.4415
+    },
+    {
+      "bin": "0.5-0.6",
+      "count": 1173,
+      "avg_confidence": 0.5546,
+      "priority_accuracy": 0.4936
+    },
+    {
+      "bin": "0.6-0.7",
+      "count": 948,
+      "avg_confidence": 0.6406,
+      "priority_accuracy": 0.558
+    },
+    {
+      "bin": "0.7-0.8",
+      "count": 253,
+      "avg_confidence": 0.7435,
+      "priority_accuracy": 0.7194
+    },
+    {
+      "bin": "0.8-0.9",
+      "count": 62,
+      "avg_confidence": 0.8319,
+      "priority_accuracy": 0.6774
+    },
+    {
+      "bin": "0.9-1.0",
+      "count": 0,
+      "avg_confidence": 0,
+      "priority_accuracy": 0
+    }
+  ],
+  "note": "置信度是三个任务 predict_proba 最大值的平均；在 val 上选满足「优先级准确率 >= 0.90 且覆盖 >= 5%」的最低阈值，未达标则取准确率最高的档并标记 qualified=false。test 全程不参与阈值选择。"
+}

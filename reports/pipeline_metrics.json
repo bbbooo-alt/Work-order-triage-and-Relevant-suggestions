@@ -1,0 +1,1141 @@
+{
+  "generated_at": "2026-11-10T07:50:16",
+  "pipeline_version": "unified-pipeline-v1",
+  "elapsed_sec": 2.01,
+  "ok": true,
+  "checks": [
+    {
+      "name": "数据库与本地模型服务就绪",
+      "passed": true,
+      "detail": "工单 {'test': 2858, 'train': 22871, 'val': 2858}，Ollama 可用"
+    },
+    {
+      "name": "八组验收检查全部通过",
+      "passed": true,
+      "detail": "① 评测地基 4/4；② 分诊 11/11；③ 解决建议 15/15；④ 路由 15/15；⑤ 上线闭环 14/14；P0-1 技能预测 6/6；P0-2 生成与标注 9/9；P0-3 校准与回流重训 9/9"
+    },
+    {
+      "name": "P0 三项产物齐备",
+      "passed": true,
+      "detail": "技能预测 5716 行、生成缓存 4 行、注册表 1 个版本"
+    },
+    {
+      "name": "七段链路全部执行且无异常",
+      "passed": true,
+      "detail": "intake → triage → skills → retrieval → generation → routing → gate"
+    },
+    {
+      "name": "下游只用预测技能、不用真值",
+      "passed": true,
+      "detail": "路由 required=[1, 2, 3, 5, 12]，来自 skill_predictions.pred_skills"
+    },
+    {
+      "name": "检索拒答时不硬编答案",
+      "passed": true,
+      "detail": "检索 abstain=False，生成 abstained=False"
+    },
+    {
+      "name": "自动档门禁给出可解释结论",
+      "passed": true,
+      "detail": "allowed=False，风险 medium，处置「转人工处理」"
+    },
+    {
+      "name": "线上派单表仍为 0 行",
+      "passed": true,
+      "detail": "流水线路由为 dry_run，审计只写 pipeline_runs / decision_log"
+    },
+    {
+      "name": "全量验收未覆盖任何既有报告",
+      "passed": true,
+      "detail": "11 份报告内容哈希前后一致"
+    }
+  ],
+  "groups": [
+    {
+      "key": "step1",
+      "label": "① 评测地基",
+      "source": "baseline_metrics.json",
+      "passed": 4,
+      "total": 4,
+      "checks": [
+        {
+          "name": "冻结划分与清单一致",
+          "passed": true,
+          "detail": "train/val/test = {'test': 2858, 'train': 22871, 'val': 2858}"
+        },
+        {
+          "name": "两条基线齐全",
+          "passed": true,
+          "detail": "报告模型 ['majority-v0', 'keyword-v0']"
+        },
+        {
+          "name": "评测门槛已写死",
+          "passed": true,
+          "detail": "{'min_macro_f1_gain_over_keyword_baseline': 0.03, 'no_class_f1_regression': True, 'routing_valid_rate_min': 0.9, 'routing_timeout_rate_max': 0.2, 'frozen_test_set': 'eval/split_frozen.csv', 'test_set_evaluations': 1, 'note': '阶段 2 及以后模型的进阶门槛：macro-F1 相对关键词基线至少 +3 个点、无任一类别 F1 下降、路由派单成功率不低于 90%、超时率不高于 20%。第一步只负责把门槛写死，不用于判定基线本身。test 集只在最终评一次。'}"
+        },
+        {
+          "name": "线上派单表隔离",
+          "passed": true,
+          "detail": "assignments 0 行，越界预测 0 条"
+        }
+      ]
+    },
+    {
+      "key": "step2",
+      "label": "② 分诊",
+      "source": "triage_metrics.json",
+      "passed": 11,
+      "total": 11,
+      "checks": [
+        {
+          "name": "type 的 macro-F1 提升 ≥ +0.03",
+          "passed": true,
+          "detail": "关键词基线 0.307 → 分诊模型 0.8362，差值 0.5292"
+        },
+        {
+          "name": "queue 的 macro-F1 提升 ≥ +0.03",
+          "passed": true,
+          "detail": "关键词基线 0.2165 → 分诊模型 0.428，差值 0.2115"
+        },
+        {
+          "name": "priority 的 macro-F1 提升 ≥ +0.03",
+          "passed": true,
+          "detail": "关键词基线 0.3518 → 分诊模型 0.5337，差值 0.1819"
+        },
+        {
+          "name": "无任一类别 F1 下降",
+          "passed": true,
+          "detail": "所有类别的逐类 F1 均未下降"
+        },
+        {
+          "name": "优先级有序性不劣于基线",
+          "passed": true,
+          "detail": "MAE（平均绝对误差）0.7127 → 0.5297；严重错误率 0.1043 → 0.0815"
+        },
+        {
+          "name": "英、德语分别不掉点",
+          "passed": true,
+          "detail": "en/de 两类语种的三个任务均未低于基线"
+        },
+        {
+          "name": "低置信度出口可用",
+          "passed": true,
+          "detail": "阈值 0.45；test 集中 112 条低于阈值，建议转人工"
+        },
+        {
+          "name": "向量化只在训练集拟合",
+          "passed": true,
+          "detail": "TF-IDF（词频-逆文档频率）char_wb 3-5 元语法，max_features=30000，仅在 train（训练集）拟合"
+        },
+        {
+          "name": "配置由验证集选定",
+          "passed": true,
+          "detail": "候选 ['plain', 'balanced']；选中 balanced；val 平均分 0.5916"
+        },
+        {
+          "name": "测试集预测已落库",
+          "passed": true,
+          "detail": "triage_results 中 triage-l1-v1 共 2858 条"
+        },
+        {
+          "name": "真值与线上派单未被改动",
+          "passed": true,
+          "detail": "assignments 仍为 0 行；越界预测 0 条"
+        }
+      ]
+    },
+    {
+      "key": "step3",
+      "label": "③ 解决建议",
+      "source": "rag_metrics.json",
+      "passed": 15,
+      "total": 15,
+      "checks": [
+        {
+          "name": "三类语料可区分",
+          "passed": true,
+          "detail": "answer（客服回复）3032 / body（工单正文）800 / kb（知识文档）12"
+        },
+        {
+          "name": "权威知识文档已灌入并有向量",
+          "passed": true,
+          "detail": "共 12 条 kb（标准作业程序式排查步骤），全部生成 1024 维向量"
+        },
+        {
+          "name": "工单正文已纳入索引",
+          "passed": true,
+          "detail": "确定性抽样 800 条，避免全量嵌入的漫长等待"
+        },
+        {
+          "name": "混合检索所需索引齐备",
+          "passed": true,
+          "detail": "全文索引（物化 tsvector 生成列）+ 向量索引：idx_rk_embedding_hnsw, idx_rk_fts"
+        },
+        {
+          "name": "黄金评测集已建立",
+          "passed": true,
+          "detail": "50 条，标注类型为 weak_label（弱标注，非人工逐条标注）"
+        },
+        {
+          "name": "关键词通道可用且权重经过择优",
+          "passed": true,
+          "detail": "验证子集比较了 4 档权重，选出 0.3，最终生效 0.0；1.0 的查询有关键词命中。长工单须做实词抽取与前缀匹配，整段文本做 AND 查询会零命中"
+        },
+        {
+          "name": "调参子集与评测子集隔离",
+          "passed": true,
+          "detail": "20 条只用于选权重，30 条不参与挑权重"
+        },
+        {
+          "name": "上线护栏：出现回退自动降级",
+          "passed": true,
+          "detail": "护栏已触发，自动退回纯向量；护栏只降级、不拿评测集反向调参"
+        },
+        {
+          "name": "混合检索 Recall@5 不低于纯向量",
+          "passed": true,
+          "detail": "纯向量 0.9333 → 混合检索 0.9333（在隔离的评测子集上）"
+        },
+        {
+          "name": "混合检索 MRR 不低于纯向量",
+          "passed": true,
+          "detail": "纯向量 0.6706 → 混合检索 0.6706（在隔离的评测子集上）"
+        },
+        {
+          "name": "权威知识进入候选结果",
+          "passed": true,
+          "detail": "混合检索 1.0 的查询在前 5 条里至少含 1 条知识文档（分层召回）"
+        },
+        {
+          "name": "无关查询全部被拒答",
+          "passed": true,
+          "detail": "3/3 条无关查询被拦截；词面重合数分别为 [0, 0, 0]"
+        },
+        {
+          "name": "拒答阈值经过校准而非拍脑袋",
+          "passed": true,
+          "detail": "正样本相似度 0.3814~0.6882，负样本 0.3552~0.6061；分布重叠，故改用词面重合数 >=1 作为可答条件"
+        },
+        {
+          "name": "先只检索、不生成",
+          "passed": true,
+          "detail": "本阶段只返回检索片段与来源，不调用大模型生成，便于定位问题在检索还是生成"
+        },
+        {
+          "name": "结构化建议可展示",
+          "passed": true,
+          "detail": "样例查询返回命中片段、来源类型与相似度，可直接给工程师核对"
+        }
+      ]
+    },
+    {
+      "key": "step4",
+      "label": "④ 路由",
+      "source": "routing_metrics.json",
+      "passed": 15,
+      "total": 15,
+      "checks": [
+        {
+          "name": "回放口径与轮询基线一致",
+          "passed": true,
+          "detail": "同一批 500 条 test 工单、同一时间映射；基线 500 条"
+        },
+        {
+          "name": "三段硬约束全部生效",
+          "passed": true,
+          "detail": "所有实际派出的 232 条均同时满足技能、班次、负荷约束；合规率 1.0"
+        },
+        {
+          "name": "派单合规率跨过写死的门槛",
+          "passed": true,
+          "detail": "1.0 >= 0.9（第一步 thresholds.json）"
+        },
+        {
+          "name": "合法派单数显著多于轮询",
+          "passed": true,
+          "detail": "轮询仅 46 条合法（0.092）→ 本步 232 条，净增 186 条"
+        },
+        {
+          "name": "超时率跨过门槛且不高于基线",
+          "passed": true,
+          "detail": "轮询 0.212 → 本步 0.12；上限 0.2"
+        },
+        {
+          "name": "无任一工程师超过容量",
+          "passed": true,
+          "detail": "派单时最大负荷/容量 = 0.875；负荷由事务内实时聚合，不存静态字段"
+        },
+        {
+          "name": "负荷分布没有极端倾斜",
+          "passed": true,
+          "detail": "各工程师派单数 12~29，标准差 5.1（轮询 0.47）"
+        },
+        {
+          "name": "无可用工程师时明确降级",
+          "passed": true,
+          "detail": "268 条转人工队列（0.536），其中被硬派 0 条；覆盖率 0.464"
+        },
+        {
+          "name": "并发压测不双派、不超容量",
+          "passed": true,
+          "detail": "6 线程同一时刻派 24 单：落库 24 行 / 去重后 24 单，超容量工程师 0 人，错误 0 个"
+        },
+        {
+          "name": "派单幂等",
+          "passed": true,
+          "detail": "重复派工单 24366：行数 500 → 500，被识别为重复"
+        },
+        {
+          "name": "每条决策可解释",
+          "passed": true,
+          "detail": "500 条记录全部带 reason（硬约束结果 + 软打分明细），缺失 0 条"
+        },
+        {
+          "name": "离线回放与线上、前几步完全隔离",
+          "passed": true,
+          "detail": "线上 assignments 0 行；第一步 eval_assignments 500 行未变；本步只写 route_assignments"
+        },
+        {
+          "name": "不用大模型拍板派单",
+          "passed": true,
+          "detail": "纯规则引擎：硬约束过滤 + 可复现的加权打分，结果可审计"
+        },
+        {
+          "name": "输入来自第二步分诊结果",
+          "passed": true,
+          "detail": "回放读取 triage-l1-v1 的 pred_priority / pred_queue 作为路由输入"
+        },
+        {
+          "name": "第四步报告独立落盘",
+          "passed": true,
+          "detail": "F:\\0MyProject\\工单分诊与解决建议\\reports\\routing_metrics.json"
+        }
+      ]
+    },
+    {
+      "key": "step5",
+      "label": "⑤ 上线闭环",
+      "source": "lifecycle_metrics.json",
+      "passed": 14,
+      "total": 14,
+      "checks": [
+        {
+          "name": "三档按顺序逐档放开",
+          "passed": true,
+          "detail": "影子（只记录）→ 辅助（人确认）→ 自动（按门禁生效），顺序不可跳档"
+        },
+        {
+          "name": "影子模式只记录、不改变实际流程",
+          "passed": true,
+          "detail": "影子批 12 条工单，36 条审计日志，生效 0 条"
+        },
+        {
+          "name": "只有自动档才落生效决策",
+          "passed": true,
+          "detail": "沙盒 auto_assignments 11 行，辅助/影子档 0 行"
+        },
+        {
+          "name": "每个阶段都有审计日志",
+          "passed": true,
+          "detail": "9 组「模式 × 阶段」记录，覆盖分诊 / 检索 / 路由"
+        },
+        {
+          "name": "人工改判可回流为标注",
+          "passed": true,
+          "detail": "反馈 12 条，其中 3 条进入下一轮标注池"
+        },
+        {
+          "name": "冻结测试集未被污染",
+          "passed": true,
+          "detail": "test 仍为 2858 行，与第一步冻结清单一致；从 test 泄漏进训练池 0 条"
+        },
+        {
+          "name": "漂移监控有快照与写死的阈值",
+          "passed": true,
+          "detail": "2 条快照；阈值 {'low_confidence_rate': 0.4, 'retrieval_abstain_rate': 0.6, 'routing_degraded_rate': 0.7, 'human_override_rate': 0.35}"
+        },
+        {
+          "name": "告警规则确实会触发",
+          "passed": true,
+          "detail": "当前窗口告警 True（human_override_rate 0.5 > 0.35）；注入拒答率漂移后 True（retrieval_abstain_rate 0.95 > 0.6；human_override_rate 0.5 > 0.35）"
+        },
+        {
+          "name": "回退开关演练通过",
+          "passed": true,
+          "detail": "开关打开后自动模式 allowed=False，模式回退为 shadow"
+        },
+        {
+          "name": "PII 脱敏可用",
+          "passed": true,
+          "detail": "样例脱敏后：Customer mail: [EMAIL], phone [PHONE], invoice [NUMBER] and IP [IP]."
+        },
+        {
+          "name": "线上表与前四步数据保持干净",
+          "passed": true,
+          "detail": "线上 assignments 0 行；本步只写 lifecycle_config, decision_log, feedback_events, drift_snapshots, auto_assignments"
+        },
+        {
+          "name": "尺子冻结：复用第一步基线、未重新训练",
+          "passed": true,
+          "detail": "冻结基线来自 baseline_metrics.json，路由超时率 0.212"
+        },
+        {
+          "name": "合规结论明确",
+          "passed": true,
+          "detail": "cc-by-nc-4.0：禁止：仅够内部验证，真实生产必须更换数据源或取得授权；真实工单含个人身份信息，入库前脱敏，并保留审计日志与访问控制"
+        },
+        {
+          "name": "第五步报告独立落盘",
+          "passed": true,
+          "detail": "F:\\0MyProject\\工单分诊与解决建议\\reports\\lifecycle_metrics.json"
+        }
+      ]
+    },
+    {
+      "key": "p0_1",
+      "label": "P0-1 技能预测",
+      "source": "skills_metrics.json",
+      "passed": 6,
+      "total": 6,
+      "checks": [
+        {
+          "name": "技能预测模型已训练并落库",
+          "passed": true,
+          "detail": "test 2858 条，micro-F1 0.8299，macro-F1 0.7648，子集完全命中率 0.3625"
+        },
+        {
+          "name": "阈值只在验证集上选",
+          "passed": true,
+          "detail": "全局阈值 0.5，13 个域各自的阈值在 val 上按 F1 择优"
+        },
+        {
+          "name": "pred_skills 不再是空数组",
+          "passed": true,
+          "detail": "平均预测技能数 3.177，真值平均 2.89；已回填 triage_results.pred_skills"
+        },
+        {
+          "name": "链路缺口已打通：路由改用预测技能",
+          "passed": true,
+          "detail": "route-v1-predicted 成功派出 229 单，合规率 1.0"
+        },
+        {
+          "name": "差距被量化而非忽略",
+          "passed": true,
+          "detail": "合法派单数 232 → 229（-3），覆盖率 0.464 → 0.458（-0.0060）"
+        },
+        {
+          "name": "真值上界与实际结果都写进了独立报告",
+          "passed": true,
+          "detail": "F:\\0MyProject\\工单分诊与解决建议\\reports\\skills_impact.json；第四步原有 route-v1 回放保持不变"
+        }
+      ]
+    },
+    {
+      "key": "p0_2",
+      "label": "P0-2 生成与标注",
+      "source": "generation_metrics.json",
+      "passed": 9,
+      "total": 9,
+      "checks": [
+        {
+          "name": "人工标注集已建立并可复核",
+          "passed": true,
+          "detail": "共 50 条，已人工复核 0 条、草稿 50 条；导出 F:\\0MyProject\\工单分诊与解决建议\\eval\\golden_set_human.csv"
+        },
+        {
+          "name": "用标注集重算了检索指标",
+          "passed": true,
+          "detail": "Recall@5 0.9、MRR 0.6028，不再只靠弱标注自证"
+        },
+        {
+          "name": "生成环节真的调用了本地大模型",
+          "passed": true,
+          "detail": "6 个样本中 3 个生成成功、3 个明确拒答，模型 qwen3:14b"
+        },
+        {
+          "name": "检索拒答时不硬编答案",
+          "passed": true,
+          "detail": "检索侧拒答的样本直接跳过生成，返回转人工提示"
+        },
+        {
+          "name": "引用校验可用",
+          "passed": true,
+          "detail": "生成结果里的来源编号会映射回 chunk_id，越界引用被剔除并计入有效率"
+        },
+        {
+          "name": "幻觉抽检信号可用",
+          "passed": true,
+          "detail": "平均词面 grounding 0.5556；另有人工评分表 F:\\0MyProject\\工单分诊与解决建议\\eval\\generation_review.csv"
+        },
+        {
+          "name": "只检索 vs 检索+生成两套结果已对比",
+          "passed": true,
+          "detail": "6 组对照（可生成 4 / 拒答对照 2），含片段数、拒答、步骤数、引用、grounding 与耗时"
+        },
+        {
+          "name": "生成结果可缓存、可复现",
+          "passed": true,
+          "detail": "generation_cache 已存 3 条，相同查询与候选不重复调用模型"
+        },
+        {
+          "name": "草稿状态与已知限制如实披露",
+          "passed": true,
+          "detail": "报告明确区分草稿/人工标注，并说明 grounding 只是近似信号"
+        }
+      ]
+    },
+    {
+      "key": "p0_3",
+      "label": "P0-3 校准与回流重训",
+      "source": "closed_loop_metrics.json",
+      "passed": 9,
+      "total": 9,
+      "checks": [
+        {
+          "name": "置信度阈值在验证集上校准",
+          "passed": true,
+          "detail": "val 2858 条，选出 auto_conf_min=0.85，该档优先级准确率 0.7273、覆盖 0.0038；qualified=False"
+        },
+        {
+          "name": "自动档门禁含置信度与风险分级",
+          "passed": true,
+          "detail": "低置信度+高优先级+拒答+无工程师的探针被拒绝，风险 high，理由 5 条"
+        },
+        {
+          "name": "满足全部条件时才放行",
+          "passed": true,
+          "detail": "高置信度+低风险探针放行=True，5 项门禁 {'kill_switch_off': True, 'confidence_ok': True, 'risk_low': True, 'retrieval_grounded': True, 'routing_assigned': True}"
+        },
+        {
+          "name": "回流样本来自 train、test 零泄漏",
+          "passed": true,
+          "detail": "消费 3 条 train 改判，test 泄漏 0 条"
+        },
+        {
+          "name": "回流样本真的进入重训",
+          "passed": true,
+          "detail": "增强训练行 75，总训练行 22946，数据指纹 0f49c9449c5ee293"
+        },
+        {
+          "name": "影子版已训练并落库",
+          "passed": true,
+          "detail": "版本 triage-shadow-v1，写入 triage_results"
+        },
+        {
+          "name": "复用了第一步统一评测脚本与冻结基线",
+          "passed": true,
+          "detail": "报告含关键词基线 / 线上版 / 影子版；冻结 test 仍 2858 条"
+        },
+        {
+          "name": "晋升判定保守、不自动替换线上版本",
+          "passed": true,
+          "detail": "promoted=False；val 三任务不掉点且 test 优先级 MAE 不劣化；本轮只产出影子版，不自动替换线上版本"
+        },
+        {
+          "name": "闭环报告独立落盘",
+          "passed": true,
+          "detail": "F:\\0MyProject\\工单分诊与解决建议\\reports\\closed_loop_metrics.json"
+        }
+      ]
+    }
+  ],
+  "trace": {
+    "ok": true,
+    "generated_at": "2026-11-10T07:50:16",
+    "ticket": {
+      "ticket_id": 2338,
+      "split": "test",
+      "subject": "Medical Data Retrieval Problem",
+      "language": "en",
+      "truth": {
+        "type": "Incident",
+        "queue": "General Inquiry",
+        "priority": "low",
+        "required_skills": [
+          2,
+          3,
+          5
+        ]
+      }
+    },
+    "stages": [
+      {
+        "key": "intake",
+        "name": "① 工单接入与 PII 脱敏",
+        "status": "ok",
+        "elapsed_ms": 1,
+        "summary": "工单 #2338（test），展示文本已脱敏",
+        "data": {
+          "ticket_id": 2338,
+          "split": "test",
+          "subject": "Medical Data Retrieval Problem",
+          "body_preview": "Customer Support, reporting a recurring problem with accessing medical records. Despite troubleshooting attempts, the issue continues. Errors happen intermittently, and it is suspected that conflicts with network adapters might be the underlying cause. To address this, rebooted the affected devices, but unfortunately, this did not resolve the issue. Additionally, updated the software drivers in ho",
+          "language": "en",
+          "truth": {
+            "type": "Incident",
+            "queue": "General Inquiry",
+            "priority": "low",
+            "required_skills": [
+              2,
+              3,
+              5
+            ]
+          },
+          "redacted_preview": "Medical Data Retrieval Problem Customer Support, reporting a recurring problem with accessing medical records. Despite troubleshooting attempts, the issue continues. Errors happen intermittently, and it is suspected that conflicts with network adapters might be the underlying cause. To address this, rebooted the affected devices, but unfortunately, this did not resolve the issue. Additionally, upd",
+          "pii_changed": false
+        }
+      },
+      {
+        "key": "triage",
+        "name": "② 分诊预测（类型 / 部门 / 优先级 / 置信度）",
+        "status": "ok",
+        "elapsed_ms": 0,
+        "summary": "预测 Problem / General Inquiry / medium，置信度 0.5724285",
+        "data": {
+          "model_version": "triage-l1-v1",
+          "pred_type": "Problem",
+          "pred_queue": "General Inquiry",
+          "pred_priority": "medium",
+          "confidence": 0.5724285,
+          "low_confidence": false,
+          "source": "triage_results（只在 train 拟合、val 选配置、test 评一次）"
+        }
+      },
+      {
+        "key": "skills",
+        "name": "③ 技能多标签预测（P0-1）",
+        "status": "ok",
+        "elapsed_ms": 0,
+        "summary": "预测技能 5 个，真值 3 个；下游按预测值派单",
+        "data": {
+          "model_version": "skills-l1-v1",
+          "pred_skills": [
+            1,
+            2,
+            3,
+            5,
+            12
+          ],
+          "true_skills": [
+            2,
+            3,
+            5
+          ],
+          "matched": [
+            2,
+            3,
+            5
+          ],
+          "missed": [],
+          "extra": [
+            1,
+            12
+          ],
+          "note": "路由阶段使用 pred_skills，不使用真值 required_skills"
+        }
+      },
+      {
+        "key": "retrieval",
+        "name": "④ 混合检索与拒答（第三步）",
+        "status": "ok",
+        "elapsed_ms": 650,
+        "summary": "召回 5 条片段，权威知识 5 条",
+        "data": {
+          "mode": "hybrid",
+          "abstain": false,
+          "best_kb_similarity": 0.4713,
+          "lexical_overlap": 3,
+          "keyword_hits": 20,
+          "reranked_by_keyword": 6,
+          "kb_in_top_k": 5,
+          "keyword_weight": 0.0,
+          "hits": [
+            {
+              "rank": 1,
+              "chunk_id": 3033,
+              "source": "权威知识文档",
+              "chunk_type": "kb",
+              "similarity": 0.4713,
+              "channels": "vector+keyword",
+              "preview": "VPN and network connectivity troubleshooting. Check the VPN router model and firmware version, review recent network configuration changes, verify DNS and routing tables, collect client logs with timestamps and error mes"
+            },
+            {
+              "rank": 2,
+              "chunk_id": 3035,
+              "source": "权威知识文档",
+              "chunk_type": "kb",
+              "similarity": 0.443,
+              "channels": "vector+keyword",
+              "preview": "Hardware and device troubleshooting for printers, headsets, scanners, SSD, NAS, projectors and audio devices. Confirm exact device model, operating system version, driver and firmware version, test a different cable or p"
+            },
+            {
+              "rank": 3,
+              "chunk_id": 3037,
+              "source": "权威知识文档",
+              "chunk_type": "kb",
+              "similarity": 0.4266,
+              "channels": "vector",
+              "preview": "Software bug and performance investigation. Reproduce the issue, record the exact steps, browser and operating system version, capture crash logs and screenshots, check recent updates, patches and compatibility with the "
+            },
+            {
+              "rank": 4,
+              "chunk_id": 3034,
+              "source": "权威知识文档",
+              "chunk_type": "kb",
+              "similarity": 0.3986,
+              "channels": "vector+keyword",
+              "preview": "Security incident and data breach response. Isolate affected systems immediately, preserve logs and alerts, notify the security team, verify compliance requirements such as HIPAA, GDPR and ISO 27001, check for unauthoriz"
+            },
+            {
+              "rank": 5,
+              "chunk_id": 3043,
+              "source": "权威知识文档",
+              "chunk_type": "kb",
+              "similarity": 0.344,
+              "channels": "vector",
+              "preview": "Human resources and organisation record updates. Verify the requester identity, department, employee role, effective date and the official document supporting the change. Update organisational charts, collaboration tooli"
+            }
+          ]
+        }
+      },
+      {
+        "key": "generation",
+        "name": "⑤ 基于检索片段的生成（P0-2）",
+        "status": "ok",
+        "elapsed_ms": 96,
+        "summary": "生成 3 步建议，2 条有效引用，grounding 1.0，耗时 17.45s（缓存命中）",
+        "data": {
+          "model": "qwen3:14b",
+          "abstained": false,
+          "reason": "",
+          "steps": [
+            "Check the network adapter model and firmware version to identify potential conflicts.",
+            "Review recent network configuration changes and verify DNS and routing tables for inconsistencies.",
+            "Collect client logs with timestamps and error messages to analyze the intermittent issue."
+          ],
+          "info_needed": [
+            "What is the exact model and firmware version of the network adapter?",
+            "Have there been any recent changes to the network configuration?",
+            "Can you provide the latest logs with timestamps and error messages?"
+          ],
+          "escalation": "Escalate to the network security team if unauthorized access or data breaches are suspected.",
+          "citations": [
+            {
+              "source": "权威知识文档",
+              "chunk_id": 3033,
+              "position": 1
+            },
+            {
+              "source": "权威知识文档",
+              "chunk_id": 3035,
+              "position": 2
+            }
+          ],
+          "citation_valid_rate": null,
+          "grounded": 1.0,
+          "latency_sec": 17.45,
+          "from_cache": true,
+          "retrieval_only": {
+            "top_k": 5,
+            "abstain": false,
+            "top_sources": [
+              "权威知识文档",
+              "权威知识文档",
+              "权威知识文档"
+            ],
+            "strategy": "只返回原文片段，未经大模型改写"
+          },
+          "parse_error": false
+        }
+      },
+      {
+        "key": "routing",
+        "name": "⑥ 技能∩排班∩容量路由（第四步）",
+        "status": "ok",
+        "elapsed_ms": 93,
+        "summary": "派给工程师 e6，得分 12.1",
+        "data": {
+          "status": "assigned",
+          "reason": "pred_priority=medium; required_skills=[1, 2, 3, 5, 12]; rejects={'shift_off': 8, 'skill_miss': 3}; chosen=e6 skill=ok[3, 12] shift=on_call_only load=0/8 | score=12.1 = prof 10.0 + level 3.6 + load -0.0 + high 0.0 + oncall -1.5",
+          "required_used": [
+            1,
+            2,
+            3,
+            5,
+            12
+          ],
+          "required_source": "skill_predictions.pred_skills",
+          "chosen": {
+            "engineer_id": 6,
+            "score": 12.1,
+            "level": 3,
+            "matched_domains": [
+              3,
+              12
+            ],
+            "load": 0,
+            "capacity": 8,
+            "only_on_call": true,
+            "parts": {
+              "proficiency": 10.0,
+              "level": 3.6,
+              "load": -0.0,
+              "high_priority": 0.0,
+              "on_call_only": -1.5
+            }
+          },
+          "candidates": [
+            {
+              "engineer_id": 6,
+              "level": 3,
+              "capacity": 8,
+              "matched_domains": [
+                3,
+                12
+              ],
+              "proficiency": 5,
+              "load": 0,
+              "only_on_call": true,
+              "score": 12.1,
+              "finished_at": "2026-11-09T23:00:00+08:00",
+              "parts": {
+                "proficiency": 10.0,
+                "level": 3.6,
+                "load": -0.0,
+                "high_priority": 0.0,
+                "on_call_only": -1.5
+              }
+            }
+          ],
+          "candidate_count": 1,
+          "rejects": {
+            "shift_off": 8,
+            "skill_miss": 3
+          },
+          "dry_run": true
+        }
+      },
+      {
+        "key": "gate",
+        "name": "⑦ 置信度＋风险自动档门禁（P0-3 / 第五步）",
+        "status": "warn",
+        "elapsed_ms": 53,
+        "summary": "门禁拒绝（confidence_ok, risk_low），转人工确认",
+        "data": {
+          "allowed": false,
+          "mode": "shadow",
+          "reason": "门禁拒绝：confidence_ok、risk_low",
+          "risk": {
+            "level": "medium",
+            "score": 2,
+            "reasons": [
+              "置信度 0.5724285 < 准入阈值 0.85"
+            ]
+          },
+          "auto_conf_min": 0.85,
+          "failed": [
+            "confidence_ok",
+            "risk_low"
+          ],
+          "checks": {
+            "kill_switch_off": true,
+            "confidence_ok": false,
+            "risk_low": false,
+            "retrieval_grounded": true,
+            "routing_assigned": true
+          },
+          "calibration_file": "F:\\0MyProject\\工单分诊与解决建议\\eval\\calibration.json"
+        }
+      }
+    ],
+    "final": {
+      "pipeline_version": "unified-pipeline-v1",
+      "ticket_id": 2338,
+      "mode": "shadow",
+      "kill_switch_on": false,
+      "auto_allowed": false,
+      "disposition": "转人工处理",
+      "risk": {
+        "level": "medium",
+        "score": 2,
+        "reasons": [
+          "置信度 0.5724285 < 准入阈值 0.85"
+        ]
+      },
+      "gate_checks": {
+        "kill_switch_off": true,
+        "confidence_ok": false,
+        "risk_low": false,
+        "retrieval_grounded": true,
+        "routing_assigned": true
+      },
+      "failed_gates": [
+        "confidence_ok",
+        "risk_low"
+      ],
+      "chain": [
+        "triage_results.pred_*",
+        "skill_predictions.pred_skills",
+        "knowledge.search",
+        "generation.generate",
+        "route.assign_one(dry_run)",
+        "closedloop.auto_eligibility",
+        "lifecycle.mode_state / decision_log"
+      ],
+      "isolation": {
+        "online_assignments_written": 0,
+        "note": "路由为 dry_run，只写独立审计表 pipeline_runs，线上 assignments 保持 0 行"
+      }
+    },
+    "elapsed_ms": 893,
+    "run_id": 8
+  },
+  "readiness": {
+    "db_ok": true,
+    "splits": {
+      "test": 2858,
+      "train": 22871,
+      "val": 2858
+    },
+    "tables": {
+      "tickets": 28587,
+      "triage_results": 11432,
+      "skill_predictions": 5716,
+      "resolution_knowledge": 3844,
+      "generation_cache": 4,
+      "golden_labels": 50,
+      "generation_review": 0,
+      "route_assignments": 1024,
+      "decision_log": 108,
+      "feedback_events": 12,
+      "drift_snapshots": 2,
+      "auto_assignments": 11,
+      "model_registry": 1,
+      "pipeline_runs": 7,
+      "assignments": 0
+    },
+    "reports": {
+      "step1": {
+        "file": "baseline_metrics.json",
+        "exists": true,
+        "generated_at": "2026-11-10T07:47:25"
+      },
+      "step2": {
+        "file": "triage_metrics.json",
+        "exists": true,
+        "generated_at": "2026-11-10T07:48:01"
+      },
+      "step3": {
+        "file": "rag_metrics.json",
+        "exists": true,
+        "generated_at": "2026-11-10T07:49:22"
+      },
+      "step4": {
+        "file": "routing_metrics.json",
+        "exists": true,
+        "generated_at": "2026-11-10T07:49:45"
+      },
+      "step5": {
+        "file": "lifecycle_metrics.json",
+        "exists": true,
+        "generated_at": "2026-11-10T07:50:06"
+      },
+      "p0_1": {
+        "file": "skills_metrics.json",
+        "exists": true,
+        "generated_at": "2026-11-09T12:45:57"
+      },
+      "p0_1_impact": {
+        "file": "skills_impact.json",
+        "exists": true,
+        "generated_at": "2026-11-09T12:45:58"
+      },
+      "p0_2": {
+        "file": "generation_metrics.json",
+        "exists": true,
+        "generated_at": "2026-11-09T12:49:59"
+      },
+      "p0_3": {
+        "file": "retraining_metrics.json",
+        "exists": true,
+        "generated_at": "2026-11-09T15:01:13"
+      },
+      "closed_loop": {
+        "file": "closed_loop_metrics.json",
+        "exists": true,
+        "generated_at": "2026-11-09T15:01:13"
+      },
+      "p0_3_retrain": {
+        "file": "retraining_metrics.json",
+        "exists": true,
+        "generated_at": "2026-11-09T15:01:13"
+      }
+    },
+    "registry": [
+      {
+        "model_version": "triage-shadow-v1",
+        "promoted": false,
+        "feedback_rows": 3,
+        "trained_at": "2026-11-09 15:01:13.756253+08:00"
+      }
+    ],
+    "state": {
+      "mode": "shadow",
+      "label": "影子模式（只记录不生效）",
+      "kill_switch": "off",
+      "kill_switch_on": false,
+      "allowed_modes": [
+        "shadow",
+        "assist",
+        "auto"
+      ]
+    },
+    "ollama_ok": true,
+    "calibration": {
+      "generated_at": "2026-11-09T15:00:42",
+      "model_version": "triage-l1-v1",
+      "auto_conf_min": 0.85,
+      "target_priority_accuracy": 0.9,
+      "min_coverage": 0.05,
+      "qualified": false,
+      "chosen": {
+        "threshold": 0.85,
+        "coverage": 0.0038,
+        "priority_accuracy": 0.7273,
+        "three_task_accuracy": 0.7273
+      },
+      "val_rows": 2858,
+      "candidates": [
+        {
+          "threshold": 0.4,
+          "coverage": 0.9958,
+          "priority_accuracy": 0.5316,
+          "three_task_accuracy": 0.2112
+        },
+        {
+          "threshold": 0.45,
+          "coverage": 0.9587,
+          "priority_accuracy": 0.5347,
+          "three_task_accuracy": 0.215
+        },
+        {
+          "threshold": 0.5,
+          "coverage": 0.8523,
+          "priority_accuracy": 0.5468,
+          "three_task_accuracy": 0.2303
+        },
+        {
+          "threshold": 0.55,
+          "coverage": 0.6756,
+          "priority_accuracy": 0.5665,
+          "three_task_accuracy": 0.2584
+        },
+        {
+          "threshold": 0.6,
+          "coverage": 0.4419,
+          "priority_accuracy": 0.5962,
+          "three_task_accuracy": 0.3072
+        },
+        {
+          "threshold": 0.65,
+          "coverage": 0.2232,
+          "priority_accuracy": 0.6661,
+          "three_task_accuracy": 0.3966
+        },
+        {
+          "threshold": 0.7,
+          "coverage": 0.1102,
+          "priority_accuracy": 0.7111,
+          "three_task_accuracy": 0.4921
+        },
+        {
+          "threshold": 0.75,
+          "coverage": 0.0595,
+          "priority_accuracy": 0.7235,
+          "three_task_accuracy": 0.5294
+        },
+        {
+          "threshold": 0.8,
+          "coverage": 0.0217,
+          "priority_accuracy": 0.6774,
+          "three_task_accuracy": 0.5323
+        },
+        {
+          "threshold": 0.85,
+          "coverage": 0.0038,
+          "priority_accuracy": 0.7273,
+          "three_task_accuracy": 0.7273
+        },
+        {
+          "threshold": 0.9,
+          "coverage": 0.0,
+          "priority_accuracy": 0.0,
+          "three_task_accuracy": 0.0
+        }
+      ],
+      "reliability_bins": [
+        {
+          "bin": "0.0-0.1",
+          "count": 0,
+          "avg_confidence": 0,
+          "priority_accuracy": 0
+        },
+        {
+          "bin": "0.1-0.2",
+          "count": 0,
+          "avg_confidence": 0,
+          "priority_accuracy": 0
+        },
+        {
+          "bin": "0.2-0.3",
+          "count": 0,
+          "avg_confidence": 0,
+          "priority_accuracy": 0
+        },
+        {
+          "bin": "0.3-0.4",
+          "count": 12,
+          "avg_confidence": 0.3846,
+          "priority_accuracy": 0.4167
+        },
+        {
+          "bin": "0.4-0.5",
+          "count": 410,
+          "avg_confidence": 0.4653,
+          "priority_accuracy": 0.4415
+        },
+        {
+          "bin": "0.5-0.6",
+          "count": 1173,
+          "avg_confidence": 0.5546,
+          "priority_accuracy": 0.4936
+        },
+        {
+          "bin": "0.6-0.7",
+          "count": 948,
+          "avg_confidence": 0.6406,
+          "priority_accuracy": 0.558
+        },
+        {
+          "bin": "0.7-0.8",
+          "count": 253,
+          "avg_confidence": 0.7435,
+          "priority_accuracy": 0.7194
+        },
+        {
+          "bin": "0.8-0.9",
+          "count": 62,
+          "avg_confidence": 0.8319,
+          "priority_accuracy": 0.6774
+        },
+        {
+          "bin": "0.9-1.0",
+          "count": 0,
+          "avg_confidence": 0,
+          "priority_accuracy": 0
+        }
+      ],
+      "note": "置信度是三个任务 predict_proba 最大值的平均；在 val 上选满足「优先级准确率 >= 0.90 且覆盖 >= 5%」的最低阈值，未达标则取准确率最高的档并标记 qualified=false。test 全程不参与阈值选择。"
+    }
+  }
+}

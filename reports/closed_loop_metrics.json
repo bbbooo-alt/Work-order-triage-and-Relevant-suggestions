@@ -1,0 +1,281 @@
+{
+  "generated_at": "2026-11-09T15:01:13",
+  "calibration": {
+    "generated_at": "2026-11-09T15:00:42",
+    "model_version": "triage-l1-v1",
+    "auto_conf_min": 0.85,
+    "target_priority_accuracy": 0.9,
+    "min_coverage": 0.05,
+    "qualified": false,
+    "chosen": {
+      "threshold": 0.85,
+      "coverage": 0.0038,
+      "priority_accuracy": 0.7273,
+      "three_task_accuracy": 0.7273
+    },
+    "val_rows": 2858,
+    "candidates": [
+      {
+        "threshold": 0.4,
+        "coverage": 0.9958,
+        "priority_accuracy": 0.5316,
+        "three_task_accuracy": 0.2112
+      },
+      {
+        "threshold": 0.45,
+        "coverage": 0.9587,
+        "priority_accuracy": 0.5347,
+        "three_task_accuracy": 0.215
+      },
+      {
+        "threshold": 0.5,
+        "coverage": 0.8523,
+        "priority_accuracy": 0.5468,
+        "three_task_accuracy": 0.2303
+      },
+      {
+        "threshold": 0.55,
+        "coverage": 0.6756,
+        "priority_accuracy": 0.5665,
+        "three_task_accuracy": 0.2584
+      },
+      {
+        "threshold": 0.6,
+        "coverage": 0.4419,
+        "priority_accuracy": 0.5962,
+        "three_task_accuracy": 0.3072
+      },
+      {
+        "threshold": 0.65,
+        "coverage": 0.2232,
+        "priority_accuracy": 0.6661,
+        "three_task_accuracy": 0.3966
+      },
+      {
+        "threshold": 0.7,
+        "coverage": 0.1102,
+        "priority_accuracy": 0.7111,
+        "three_task_accuracy": 0.4921
+      },
+      {
+        "threshold": 0.75,
+        "coverage": 0.0595,
+        "priority_accuracy": 0.7235,
+        "three_task_accuracy": 0.5294
+      },
+      {
+        "threshold": 0.8,
+        "coverage": 0.0217,
+        "priority_accuracy": 0.6774,
+        "three_task_accuracy": 0.5323
+      },
+      {
+        "threshold": 0.85,
+        "coverage": 0.0038,
+        "priority_accuracy": 0.7273,
+        "three_task_accuracy": 0.7273
+      },
+      {
+        "threshold": 0.9,
+        "coverage": 0.0,
+        "priority_accuracy": 0.0,
+        "three_task_accuracy": 0.0
+      }
+    ],
+    "reliability_bins": [
+      {
+        "bin": "0.0-0.1",
+        "count": 0,
+        "avg_confidence": 0,
+        "priority_accuracy": 0
+      },
+      {
+        "bin": "0.1-0.2",
+        "count": 0,
+        "avg_confidence": 0,
+        "priority_accuracy": 0
+      },
+      {
+        "bin": "0.2-0.3",
+        "count": 0,
+        "avg_confidence": 0,
+        "priority_accuracy": 0
+      },
+      {
+        "bin": "0.3-0.4",
+        "count": 12,
+        "avg_confidence": 0.3846,
+        "priority_accuracy": 0.4167
+      },
+      {
+        "bin": "0.4-0.5",
+        "count": 410,
+        "avg_confidence": 0.4653,
+        "priority_accuracy": 0.4415
+      },
+      {
+        "bin": "0.5-0.6",
+        "count": 1173,
+        "avg_confidence": 0.5546,
+        "priority_accuracy": 0.4936
+      },
+      {
+        "bin": "0.6-0.7",
+        "count": 948,
+        "avg_confidence": 0.6406,
+        "priority_accuracy": 0.558
+      },
+      {
+        "bin": "0.7-0.8",
+        "count": 253,
+        "avg_confidence": 0.7435,
+        "priority_accuracy": 0.7194
+      },
+      {
+        "bin": "0.8-0.9",
+        "count": 62,
+        "avg_confidence": 0.8319,
+        "priority_accuracy": 0.6774
+      },
+      {
+        "bin": "0.9-1.0",
+        "count": 0,
+        "avg_confidence": 0,
+        "priority_accuracy": 0
+      }
+    ],
+    "note": "置信度是三个任务 predict_proba 最大值的平均；在 val 上选满足「优先级准确率 >= 0.90 且覆盖 >= 5%」的最低阈值，未达标则取准确率最高的档并标记 qualified=false。test 全程不参与阈值选择。"
+  },
+  "auto_gate": {
+    "confidence_min": 0.85,
+    "risk_levels": [
+      "low",
+      "medium",
+      "high"
+    ],
+    "conditions": [
+      "回退开关关闭",
+      "置信度达标",
+      "风险为 low",
+      "检索未拒答",
+      "路由有可用工程师"
+    ]
+  },
+  "feedback": {
+    "rows": 3,
+    "leaked_test_rows": 0,
+    "samples": [
+      {
+        "ticket_id": 3461,
+        "field": "priority",
+        "old_value": "high",
+        "new_value": "high"
+      },
+      {
+        "ticket_id": 5499,
+        "field": "priority",
+        "old_value": "low",
+        "new_value": "high"
+      },
+      {
+        "ticket_id": 8582,
+        "field": "priority",
+        "old_value": "medium",
+        "new_value": "high"
+      }
+    ],
+    "boost": 25
+  },
+  "retraining": {
+    "generated_at": "2026-11-09T15:01:13",
+    "shadow_version": "triage-shadow-v1",
+    "feedback": {
+      "rows": 3,
+      "leaked_test_rows": 0,
+      "samples": [
+        {
+          "ticket_id": 3461,
+          "field": "priority",
+          "old_value": "high",
+          "new_value": "high"
+        },
+        {
+          "ticket_id": 5499,
+          "field": "priority",
+          "old_value": "low",
+          "new_value": "high"
+        },
+        {
+          "ticket_id": 8582,
+          "field": "priority",
+          "old_value": "medium",
+          "new_value": "high"
+        }
+      ],
+      "boost": 25
+    },
+    "dataset_hash": "0f49c9449c5ee293",
+    "train_rows": 22946,
+    "boosted_rows": 75,
+    "val_scores": {
+      "type": 0.8352,
+      "queue": 0.432,
+      "priority": 0.5161
+    },
+    "live_val_scores": {
+      "type": 0.8368,
+      "queue": 0.4258,
+      "priority": 0.5122
+    },
+    "val_delta": {
+      "type": -0.0016,
+      "queue": 0.0062,
+      "priority": 0.0039
+    },
+    "test_comparison": {
+      "baseline_keyword": {
+        "type": 0.307,
+        "queue": 0.2165,
+        "priority": 0.3518
+      },
+      "live": {
+        "type": 0.8362,
+        "queue": 0.428,
+        "priority": 0.5337
+      },
+      "shadow": {
+        "type": 0.8384,
+        "queue": 0.4219,
+        "priority": 0.5319
+      },
+      "priority_mae": {
+        "live": 0.5297,
+        "shadow": 0.5343
+      }
+    },
+    "frozen_split": {
+      "test": 2858,
+      "train": 22871,
+      "val": 2858
+    },
+    "promoted": false,
+    "promotion_rule": "val 三任务不掉点且 test 优先级 MAE 不劣化；本轮只产出影子版，不自动替换线上版本",
+    "note": "复用了第一步的统一评测脚本 evaluate.run，报告含 4 个模型；回流样本只来自 train，test 只用于最终复评，冻结划分不变。"
+  },
+  "mode_state": {
+    "mode": "shadow",
+    "label": "影子模式（只记录不生效）",
+    "kill_switch": "off",
+    "kill_switch_on": false,
+    "allowed_modes": [
+      "shadow",
+      "assist",
+      "auto"
+    ]
+  },
+  "known_limits": [
+    "回流样本量很小，指标变化可能在噪声范围内；本轮验证的是流水线而非模型收益。",
+    "置信度只做了阈值校准，未做温度缩放/保序回归的概率校准。",
+    "影子版未自动晋升为线上版本，切换需人工确认。"
+  ]
+}

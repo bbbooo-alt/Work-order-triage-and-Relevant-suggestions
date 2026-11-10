@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第五步验收 · 上线闭环</title>
+<style>
+  :root{
+    --bg:#fdf8f5; --card:#fff; --text:#1f2937; --muted:#6b7280;
+    --line:#e5e7eb; --primary:#ea580c; --primary-dark:#c2410c;
+    --ok:#16a34a; --ok-bg:#f0fdf4; --bad:#dc2626; --bad-bg:#fef2f2;
+    --warn:#b45309; --warn-bg:#fffbeb;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+       font-family:"Microsoft YaHei","PingFang SC",system-ui,-apple-system,sans-serif;
+       font-size:15px;line-height:1.6}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 20px 60px}
+  header h1{margin:0 0 6px;font-size:26px}
+  header p{margin:0;color:var(--muted)}
+  .tip{background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;
+       padding:14px 18px;margin:20px 0;color:#7c2d12}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+        padding:20px 22px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .card h2{font-size:18px;margin:0 0 14px}
+  .btns{display:flex;flex-wrap:wrap;gap:10px}
+  button{font:inherit;cursor:pointer;border-radius:9px;padding:11px 20px;border:1px solid var(--line);
+         background:#fff;color:var(--text);transition:.15s}
+  button:hover:not(:disabled){border-color:var(--primary);color:var(--primary)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .primary{background:var(--primary);color:#fff;border-color:var(--primary);
+           font-weight:600;font-size:16px;padding:13px 28px}
+  .primary:hover:not(:disabled){background:var(--primary-dark);color:#fff;border-color:var(--primary-dark)}
+  .busy{margin-top:12px;color:var(--primary);font-weight:600;display:none}
+  .err{background:var(--bad-bg);border:1px solid #fecaca;color:#991b1b;
+       padding:12px 16px;border-radius:9px;margin-top:14px;white-space:pre-wrap;display:none}
+  .overview{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .score{font-size:40px;font-weight:700;line-height:1}
+  .badge{padding:6px 16px;border-radius:999px;font-weight:600}
+  .badge.ok{background:var(--ok-bg);color:var(--ok);border:1px solid #bbf7d0}
+  .badge.bad{background:var(--bad-bg);color:var(--bad);border:1px solid #fecaca}
+  .check{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .check:last-child{border-bottom:none}
+  .dot{width:10px;height:10px;border-radius:50%;margin-top:7px;flex:none}
+  .check.ok .dot{background:var(--ok)} .check.bad .dot{background:var(--bad)}
+  .check b{font-weight:600}
+  .check .detail{color:var(--muted);font-size:13px;margin-top:2px;word-break:break-all}
+  .tag{margin-left:auto;flex:none;font-size:13px;font-weight:600}
+  .check.ok .tag{color:var(--ok)} .check.bad .tag{color:var(--bad)}
+  .nums{display:flex;gap:12px;flex-wrap:wrap}
+  .num{flex:1;min-width:135px;background:#fffaf6;border:1px solid var(--line);
+       border-radius:10px;padding:14px}
+  .num .k{color:var(--muted);font-size:13px}
+  .num .v{font-size:22px;font-weight:700;margin-top:2px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left}
+  th{color:var(--muted);font-weight:600;background:#fffaf6}
+  td.n{font-variant-numeric:tabular-nums;font-weight:600}
+  tr.hi td{background:#fff7ed}
+  .muted{color:var(--muted);font-size:13px}
+  .hidden{display:none}
+  input,select,textarea{font:inherit;width:100%;padding:10px 12px;border:1px solid var(--line);
+         border-radius:9px;background:#fff;color:var(--text)}
+  textarea{min-height:70px;resize:vertical}
+  .formrow{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+  .formrow > div{flex:1;min-width:170px}
+  .formrow label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+  .notice{padding:12px 16px;border-radius:9px;margin:12px 0;font-weight:600}
+  .notice.ok{background:var(--ok-bg);color:#166534;border:1px solid #bbf7d0}
+  .notice.warn{background:var(--warn-bg);color:var(--warn);border:1px solid #fde68a}
+  .notice.bad{background:var(--bad-bg);color:#991b1b;border:1px solid #fecaca}
+  .banner{padding:12px 16px;border-radius:9px;margin:12px 0;font-size:14px}
+  .banner.warn{background:var(--warn-bg);border:1px solid #fde68a;color:#92400e}
+  .banner.ok{background:var(--ok-bg);border:1px solid #bbf7d0;color:#166534}
+  .pill{display:inline-block;padding:1px 9px;border-radius:999px;background:#ffedd5;
+        color:#9a3412;font-size:12px;font-weight:600;margin-right:6px}
+  pre{background:#f8fafc;border:1px solid var(--line);border-radius:9px;padding:12px 14px;
+      white-space:pre-wrap;word-break:break-all;font-size:13px;margin:8px 0}
+  .state{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .state .big{font-size:22px;font-weight:700;color:var(--primary)}
+  footer{color:var(--muted);font-size:13px;margin-top:24px;line-height:1.9}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>第五步验收 · 上线闭环</h1>
+    <p>影子 → 辅助 → 自动，回流标注、漂移告警、一键回退 · 独立验收页面（端口 8769）</p>
+  </header>
+
+  <div class="tip">
+    离线指标好看不等于上线可用。这一步把风险关进笼子：<b>先只记录、再由人确认、最后才自动生效</b>；
+    人工改判要能回流成标注，但<b>冻结的测试集永不改动</b>；指标漂移要能告警，任何时候都能一键退回人工。
+    点大按钮即可自动演练完整闭环。
+  </div>
+
+  <div class="card">
+    <h2>操作</h2>
+    <div class="btns">
+      <button class="primary" id="btnAll">一键验收第五步（推荐）</button>
+      <button id="btnMetrics">只重新计算指标</button>
+      <button id="btnStatus">刷新状态</button>
+    </div>
+    <div class="busy" id="busy">正在执行，请稍候…</div>
+    <div class="err" id="err"></div>
+  </div>
+
+  <div class="card">
+    <h2>当前状态</h2>
+    <div id="status" class="muted">正在读取…</div>
+  </div>
+
+  <div class="card">
+    <h2>亲手试：切换运行模式与一键回退</h2>
+    <div class="state" style="margin-bottom:12px">
+      <span class="big" id="modeLabel">读取中…</span>
+      <span class="pill" id="killLabel">回退开关读取中…</span>
+    </div>
+    <div class="formrow">
+      <div><label>切换到哪一档</label>
+        <select id="modeSelect">
+          <option value="shadow">影子模式（只记录不生效）</option>
+          <option value="assist">辅助模式（人确认后生效）</option>
+          <option value="auto">自动模式（按门禁生效）</option>
+        </select>
+      </div>
+    </div>
+    <div class="btns" style="margin-top:12px">
+      <button class="primary" id="btnMode">切换模式</button>
+      <button id="btnKillOn">打开回退开关</button>
+      <button id="btnKillOff">关闭回退开关</button>
+      <button id="btnAttempt">尝试自动生效（看门禁）</button>
+    </div>
+    <div id="modeResult" class="hidden" style="margin-top:14px"></div>
+  </div>
+
+  <div class="card">
+    <h2>亲手试：人工改判回流、漂移告警与 PII 脱敏</h2>
+    <div class="formrow">
+      <div><label>选择工单（含 train 与 test）</label><select id="ticketSelect"><option value="">加载中…</option></select></div>
+      <div><label>改判字段</label><select id="fieldSelect">
+        <option value="priority">优先级</option><option value="queue">处理部门</option>
+        <option value="assignee">派单工程师</option></select></div>
+      <div><label>人工改成</label><input id="newValue" value="high"></div>
+    </div>
+    <div class="btns" style="margin-top:12px">
+      <button class="primary" id="btnOverride">提交人工改判</button>
+      <button id="btnDrift">刷新漂移监控</button>
+    </div>
+    <div id="overrideResult" class="hidden" style="margin-top:14px"></div>
+    <div id="driftResult" class="hidden" style="margin-top:14px"></div>
+
+    <div style="margin-top:20px"><label class="muted">输入一段含个人信息的文本，看看脱敏效果</label>
+      <textarea id="piiText">Customer mail: hans.mueller@example.de, phone +49 170 1234567, invoice 202611091234 and IP 192.168.10.24.</textarea></div>
+    <div class="btns" style="margin-top:10px"><button id="btnRedact">脱敏看看</button></div>
+    <div id="redactResult" class="hidden" style="margin-top:14px"></div>
+  </div>
+
+  <div class="card hidden" id="resultCard">
+    <h2>验收结果</h2>
+    <div class="overview">
+      <div class="score" id="score">0 / 0</div>
+      <div>
+        <span class="badge" id="badge">未运行</span>
+        <div class="muted" id="resultHint"></div>
+      </div>
+    </div>
+    <div id="checks" style="margin-top:14px"></div>
+  </div>
+
+  <div class="card hidden" id="dataCard">
+    <h2>关键数字</h2>
+    <div class="muted" style="margin-bottom:8px">三档演练时间线（每档 12 张工单，三阶段各写一条审计日志）</div>
+    <table>
+      <thead><tr><th>档位</th><th>工单数</th><th>审计日志</th><th>生效决策</th><th>低置信度</th><th>拒答</th><th>转人工</th></tr></thead>
+      <tbody id="timelineRows"></tbody>
+    </table>
+
+    <div class="muted" style="margin:20px 0 10px">审计与回流</div>
+    <div class="nums" id="auditNums"></div>
+
+    <div class="muted" style="margin:20px 0 8px">漂移监控：当前窗口 vs 注入的漂移探针</div>
+    <table>
+      <thead><tr><th>指标</th><th>当前窗口</th><th>漂移探针</th><th>告警阈值</th></tr></thead>
+      <tbody id="driftRows"></tbody>
+    </table>
+    <div id="driftBanner"></div>
+
+    <div class="muted" style="margin:20px 0 8px">回退演练与 PII 脱敏</div>
+    <div id="rollbackInfo" class="muted"></div>
+
+    <div class="muted" style="margin:20px 0 8px">合规结论与已知限制</div>
+    <div id="compliance" class="muted"></div>
+  </div>
+
+  <footer>
+    <div><b>这些检查在验什么（大白话）</b></div>
+    <div>1. 前四步报告、线上派单表、冻结的测试集有没有被本步改动。</div>
+    <div>2. 是不是严格按「只记录 → 人确认 → 自动」逐档放开，影子模式有没有偷偷改变实际流程。</div>
+    <div>3. 人工改判能不能回流成下一轮标注；test 样本有没有被错误地混进训练池。</div>
+    <div>4. 分诊/检索/路由三个阶段的每条决策有没有审计日志，事后能不能追责。</div>
+    <div>5. 漂移指标有没有写死的阈值；人为注入一次漂移，告警是不是真的会响。</div>
+    <div>6. 回退开关打开后，自动模式是否被拒、能否立刻退回影子模式；个人信息能否脱敏。</div>
+    <div>7. 数据许可证是否允许商用，造数结论有没有被当成生产预期。</div>
+    <div style="margin-top:10px">五步全部完成。五个验收页面各自独立，随时可以分别点开复核。</div>
+  </footer>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pct = (x) => (Number(x) * 100).toFixed(1) + '%';
+
+function busy(on, text) {
+  $('#busy').style.display = on ? 'block' : 'none';
+  if (text) $('#busy').textContent = text;
+  document.querySelectorAll('button').forEach(b => b.disabled = on);
+}
+function showError(msg) {
+  const e = $('#err');
+  e.style.display = msg ? 'block' : 'none';
+  e.textContent = msg || '';
+}
+async function get(url) { const r = await fetch(url); return r.json(); }
+async function post(url, payload) {
+  const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'},
+                              body: payload ? JSON.stringify(payload) : undefined});
+  return r.json();
+}
+function numBlock(k, v) {
+  return `<div class="num"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`;
+}
+function notice(cls, text) { return `<div class="notice ${cls}">${esc(text)}</div>`; }
+
+function renderState(state) {
+  if (!state) return;
+  $('#modeLabel').textContent = state.label || state.mode;
+  $('#killLabel').textContent = state.kill_switch_on ? '回退开关：已打开（锁定影子模式）' : '回退开关：关闭';
+  $('#modeSelect').value = state.mode;
+}
+
+async function refreshStatus() {
+  try {
+    const s = await get('/api/status');
+    if (!s.db_ok) { $('#status').innerHTML = `<span style="color:var(--bad)">数据库未连接：${esc(s.error)}</span>`; return; }
+    renderState(s.state);
+    const c = s.counts || {}, sp = s.splits || {};
+    $('#status').innerHTML =
+      `数据库连接正常 · 工单 train ${sp.train||0} / val ${sp.val||0} / test ${sp.test||0}<br>` +
+      `审计日志 ${c.decision_log||0} 条 · 反馈事件 ${c.feedback_events||0} 条 · ` +
+      `漂移快照 ${c.drift_snapshots||0} 条 · 沙盒自动派单 ${c.auto_assignments||0} 条<br>` +
+      `线上派单表 ${s.online_assignments_rows} 行（必须为 0） · ` +
+      `前四步报告 ${[s.step1_report_exists,s.step2_report_exists,s.step3_report_exists,s.step4_report_exists].every(Boolean)?'均完好':'有缺失'} · ` +
+      `第五步报告 ${s.step5_report_exists?'已生成':'未生成'} · 本页端口 ${s.port}`;
+  } catch (e) { $('#status').textContent = '读取状态失败：' + e; }
+}
+
+function render(data) {
+  showError(data.error ? ('执行出错：' + data.error + (data.trace ? '\n\n' + data.trace : '')) : '');
+  const checks = data.checks || [];
+  if (!checks.length) return;
+  const passed = checks.filter(c => c.passed).length;
+  $('#resultCard').classList.remove('hidden');
+  $('#score').textContent = passed + ' / ' + checks.length;
+  const badge = $('#badge');
+  badge.textContent = data.ok ? '全部通过' : '未通过';
+  badge.className = 'badge ' + (data.ok ? 'ok' : 'bad');
+  $('#resultHint').textContent = data.ok ? '五个步骤全部完成，各验收页面可分别复核。' : '请查看下面未通过的检查项。';
+  $('#checks').innerHTML = checks.map(c =>
+    `<div class="check ${c.passed?'ok':'bad'}"><span class="dot"></span>
+       <div><b>${esc(c.name)}</b><div class="detail">${esc(c.detail)}</div></div>
+       <span class="tag">${c.passed?'通过':'未通过'}</span></div>`).join('');
+  if (data.report) renderReport(data.report);
+}
+
+function renderReport(rep) {
+  $('#dataCard').classList.remove('hidden');
+  $('#timelineRows').innerHTML = (rep.timeline || []).map(t =>
+    `<tr class="${t.mode==='auto'?'hi':''}"><td>${esc(t.label)}</td><td class="n">${t.tickets}</td>` +
+    `<td class="n">${t.log_rows}</td><td class="n">${t.auto_rows}</td>` +
+    `<td class="n">${t.low_confidence}</td><td class="n">${t.abstains}</td>` +
+    `<td class="n">${t.degraded}</td></tr>`).join('');
+
+  const a = rep.audit || {};
+  $('#auditNums').innerHTML =
+    numBlock('审计日志总量', (a.by_mode_stage||[]).reduce((s,x)=>s+x.rows,0)) +
+    numBlock('反馈事件', a.feedback_total) +
+    numBlock('进入标注池', a.label_pool_size) +
+    numBlock('test 泄漏进训练池', a.test_leaked_into_pool) +
+    numBlock('漂移快照', a.drift_snapshots) +
+    numBlock('线上派单表', a.online_assignments_rows);
+
+  const d = rep.drift || {}, cur = d.current || {}, sim = d.simulated || {}, th = d.thresholds || {};
+  $('#driftRows').innerHTML = Object.keys(th).map(k =>
+    `<tr><td>${esc(k)}</td><td class="n">${esc(cur[k]??'-')}</td>` +
+    `<td class="n">${esc(sim[k]??'-')}</td><td class="n">${esc(th[k])}</td></tr>`).join('');
+  $('#driftBanner').innerHTML =
+    `<div class="banner ${d.current_alert?'warn':'ok'}"><b>当前窗口 ${d.current_alert?'已告警':'无告警'}</b>：${esc(d.current_reasons||'')}</div>` +
+    `<div class="banner warn"><b>注入漂移探针后 ${d.simulated_alert?'已告警':'未告警'}</b>：${esc(d.simulated_reasons||'')}。${esc(d.note||'')}</div>`;
+
+  const rb = rep.rollback_demo || {}, pii = rep.pii || {};
+  $('#rollbackInfo').innerHTML =
+    `回退演练：开关打开后自动模式 allowed=<b>${esc(rb.auto_allowed)}</b>，运行模式回退为 <b>${esc(rb.mode_after)}</b>；` +
+    `${esc(rb.reason||'')}（演练结果 ${rb.passed?'通过':'未通过'}）。<br>` +
+    `PII 脱敏样例：<pre>${esc(pii.original||'')}\n→ ${esc(pii.redacted||'')}</pre>` +
+    `邮箱已移除 ${esc(pii.email_removed)}，文本发生变化 ${esc(pii.changed)}。<br>` +
+    `隔离说明：${esc((rep.isolation||{}).note||'')}`;
+
+  const c = rep.compliance || {}, fb = rep.frozen_baseline || {};
+  $('#compliance').innerHTML =
+    `数据许可证 <b>${esc(c.dataset_license)}</b>：${esc(c.commercial_use)}<br>` +
+    `${esc(c.synthetic_data)}<br>${esc(c.pii)}<br>${esc(c.audit)}<br>` +
+    `冻结基线来自 ${esc(fb.source)}，第一步路由超时率 ${esc(fb.routing_timeout_rate)}，本步未重新训练。<br>` +
+    `<b>已知限制</b>：` + (rep.known_limits||[]).map(esc).join('；');
+}
+
+async function loadTickets() {
+  const d = await get('/api/tickets');
+  if (!d.ok) { $('#ticketSelect').innerHTML = '<option value="">加载失败</option>'; return; }
+  $('#ticketSelect').innerHTML = (d.tickets || []).map(t =>
+    `<option value="${t.ticket_id}">工单 ${t.ticket_id} · ${t.split} · 当前 ${t.priority}</option>`).join('');
+}
+
+async function runAll() {
+  busy(true, '正在演练三档上线、回流、漂移告警与回退预案（约需一分钟）…');
+  showError('');
+  try {
+    const data = await post('/api/run_all');
+    render(data);
+    await refreshStatus();
+  } catch (e) { showError('请求失败：' + e); }
+  finally { busy(false); }
+}
+async function simple(url, label) {
+  busy(true, label + '，请稍候…');
+  showError('');
+  try {
+    const d = await post(url);
+    if (!d.ok) showError('执行出错：' + (d.error || '未知错误') + (d.trace ? '\n\n' + d.trace : ''));
+    else { $('#status').textContent = d.message + '（可点「一键验收第五步」查看完整结果）'; render(d); }
+    await refreshStatus();
+  } catch (e) { showError('请求失败：' + e); }
+  finally { busy(false); }
+}
+async function action(url, payload, label, target) {
+  busy(true, label + '，请稍候…');
+  showError('');
+  try {
+    const d = await post(url, payload);
+    const box = $(target);
+    box.classList.remove('hidden');
+    if (!d.ok) { box.innerHTML = notice('bad', '操作失败：' + (d.error || '未知错误')); }
+    else if (url === '/api/override') {
+      box.innerHTML = notice(d.enters_label_pool ? 'ok' : 'warn',
+        `工单 ${d.ticket_id}（${d.split}）改判 ${d.field}：${d.old_value} → ${d.new_value}。` +
+        (d.enters_label_pool ? '已进入下一轮标注池。' : '只作观察，不进训练池。')) +
+        `<pre>${esc(d.note)}</pre>`;
+    } else if (url === '/api/drift') {
+      const r = d.result;
+      box.innerHTML = notice(r.current_alert ? 'warn' : 'ok',
+        `当前窗口${r.current_alert ? '已告警' : '无告警'}：${r.current_reasons}`) +
+        `<div class="nums">` + Object.keys(r.thresholds).map(k =>
+          numBlock(k, `${r.current[k]} / 阈值 ${r.thresholds[k]}`)).join('') + `</div>` +
+        `<div class="banner warn">注入漂移探针后告警 ${esc(r.simulated_alert)}：${esc(r.simulated_reasons)}</div>`;
+    } else if (url === '/api/redact') {
+      const r = d.result;
+      box.innerHTML = notice(r.changed ? 'ok' : 'warn', r.changed ? '已完成脱敏' : '文本里未检出可脱敏内容') +
+        `<pre>原文：${esc(r.original)}\n脱敏：${esc(r.redacted)}</pre>` +
+        `<div class="muted">邮箱已移除 ${esc(r.email_removed)}</div>`;
+    } else {
+      const r = d.result || d;
+      box.innerHTML = notice(r.allowed === false || d.ok === false ? 'warn' : 'ok',
+        d.message || r.reason || (r.allowed === false ? '已被门禁拒绝' : '操作成功')) +
+        `<pre>${esc(JSON.stringify(r.state || r, null, 2))}</pre>`;
+    }
+    await refreshStatus();
+  } catch (e) { showError('请求失败：' + e); }
+  finally { busy(false); }
+}
+
+$('#btnAll').onclick = runAll;
+$('#btnMetrics').onclick = () => simple('/api/metrics', '正在从报告重新计算指标');
+$('#btnStatus').onclick = refreshStatus;
+$('#btnMode').onclick = () => action('/api/mode', {mode: $('#modeSelect').value}, '正在切换模式', '#modeResult');
+$('#btnKillOn').onclick = () => action('/api/kill_switch', {on: true}, '正在打开回退开关', '#modeResult');
+$('#btnKillOff').onclick = () => action('/api/kill_switch', {on: false}, '正在关闭回退开关', '#modeResult');
+$('#btnAttempt').onclick = () => action('/api/attempt_auto', {}, '正在检查自动模式门禁', '#modeResult');
+$('#btnOverride').onclick = () => action('/api/override',
+  {ticket_id: Number($('#ticketSelect').value), field: $('#fieldSelect').value,
+   new_value: $('#newValue').value}, '正在提交人工改判', '#overrideResult');
+$('#btnDrift').onclick = () => action('/api/drift', {}, '正在刷新漂移监控', '#driftResult');
+$('#btnRedact').onclick = () => action('/api/redact', {text: $('#piiText').value}, '正在脱敏', '#redactResult');
+window.addEventListener('load', async () => { await refreshStatus(); await loadTickets(); });
+</script>
+</body>
+</html>

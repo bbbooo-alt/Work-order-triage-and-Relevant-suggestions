@@ -1,0 +1,134 @@
+{
+  "generated_at": "2026-11-09T12:45:57",
+  "model_version": "skills-l1-v1",
+  "fitted_on": "train only",
+  "thresholds_selected_on": "val",
+  "evaluated_on": "test（只评一次）",
+  "classifier": "每域一个 SGDClassifier(log_loss, class_weight=balanced)，One-vs-Rest",
+  "vectorizer": "TF-IDF char_wb 3-5 元语法，与第二步分诊同口径",
+  "global_threshold": 0.5,
+  "per_domain_thresholds": {
+    "1": 0.6,
+    "2": 0.7,
+    "3": 0.7,
+    "4": 0.7,
+    "5": 0.35,
+    "6": 0.7,
+    "7": 0.6,
+    "8": 0.5,
+    "9": 0.5,
+    "10": 0.7,
+    "11": 0.6,
+    "12": 0.2,
+    "13": 0.5
+  },
+  "skipped_domains": [],
+  "val_micro_f1": 0.8346,
+  "test_metrics": {
+    "micro_f1": 0.8299,
+    "macro_f1": 0.7648,
+    "subset_accuracy": 0.3625,
+    "hamming_loss": 0.0794,
+    "avg_predicted_skills": 3.177,
+    "avg_true_skills": 2.89
+  },
+  "per_domain": {
+    "1": {
+      "precision": 0.9792,
+      "recall": 0.9307,
+      "f1": 0.9543,
+      "support": 707,
+      "threshold": 0.6
+    },
+    "2": {
+      "precision": 0.8238,
+      "recall": 0.826,
+      "f1": 0.8249,
+      "support": 385,
+      "threshold": 0.7
+    },
+    "3": {
+      "precision": 0.5533,
+      "recall": 0.6943,
+      "f1": 0.6158,
+      "support": 157,
+      "threshold": 0.7
+    },
+    "4": {
+      "precision": 0.4022,
+      "recall": 0.5854,
+      "f1": 0.4768,
+      "support": 246,
+      "threshold": 0.7
+    },
+    "5": {
+      "precision": 0.86,
+      "recall": 0.8974,
+      "f1": 0.8783,
+      "support": 1520,
+      "threshold": 0.35
+    },
+    "6": {
+      "precision": 0.5506,
+      "recall": 0.7597,
+      "f1": 0.6384,
+      "support": 129,
+      "threshold": 0.7
+    },
+    "7": {
+      "precision": 0.9458,
+      "recall": 0.9752,
+      "f1": 0.9602,
+      "support": 161,
+      "threshold": 0.6
+    },
+    "8": {
+      "precision": 0.7143,
+      "recall": 0.7143,
+      "f1": 0.7143,
+      "support": 7,
+      "threshold": 0.5
+    },
+    "9": {
+      "precision": 0.7752,
+      "recall": 0.8573,
+      "f1": 0.8142,
+      "support": 1030,
+      "threshold": 0.5
+    },
+    "10": {
+      "precision": 0.7512,
+      "recall": 0.8627,
+      "f1": 0.8031,
+      "support": 357,
+      "threshold": 0.7
+    },
+    "11": {
+      "precision": 0.8011,
+      "recall": 0.7886,
+      "f1": 0.7948,
+      "support": 771,
+      "threshold": 0.6
+    },
+    "12": {
+      "precision": 0.904,
+      "recall": 0.9496,
+      "f1": 0.9262,
+      "support": 2321,
+      "threshold": 0.2
+    },
+    "13": {
+      "precision": 0.433,
+      "recall": 0.7213,
+      "f1": 0.5411,
+      "support": 470,
+      "threshold": 0.5
+    }
+  },
+  "rows": {
+    "train": 22871,
+    "val": 2858,
+    "test": 2858
+  },
+  "note": "预测写入独立表 skill_predictions，并回填 triage_results.pred_skills；不改动任何真值。"
+}

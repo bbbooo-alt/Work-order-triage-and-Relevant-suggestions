@@ -1,0 +1,104 @@
+{
+  "generated_at": "2026-11-10T07:49:45",
+  "model_version": "route-v1",
+  "input_model": "triage-l1-v1",
+  "algorithm": "逐条贪心：硬约束过滤 + 加权软打分（批量最优/匈牙利算法留作二期）",
+  "hard_constraints": [
+    "技能交集",
+    "班次覆盖（on_call 仅作软扣分）",
+    "负荷未满且在职"
+  ],
+  "soft_weights": {
+    "proficiency": 2.0,
+    "level": 1.2,
+    "load": 3.0,
+    "high_priority_level": 0.8,
+    "on_call_only_penalty": 1.5
+  },
+  "metrics": {
+    "model_version": "route-v1",
+    "replay_tickets": 500,
+    "assigned_count": 232,
+    "coverage_rate": 0.464,
+    "degraded_count": 268,
+    "degraded_rate": 0.536,
+    "constraint_compliance": 1.0,
+    "timeout_count": 60,
+    "timeout_rate": 0.12,
+    "load_std": 5.1,
+    "load_min": 12,
+    "load_max": 29,
+    "max_load_ratio": 0.875,
+    "baseline_valid_count": 46,
+    "legal_assignments_gain": 186,
+    "baseline": {
+      "model_version": "round-robin-v0",
+      "tickets": 500,
+      "valid_count": 46,
+      "valid_rate": 0.092,
+      "timeout_rate": 0.212,
+      "load_std": 0.47
+    },
+    "note": "轮询基线把 500 条全部硬派，只有少数恰好满足硬约束；本步宁可转人工也不硬派，故 coverage_rate 不代表失败率。"
+  },
+  "concurrency_probe": {
+    "threads": 6,
+    "tickets": 24,
+    "same_arrival_time": "2026-11-09 17:00:00+08:00",
+    "rows": 24,
+    "distinct_tickets": 24,
+    "assigned": 19,
+    "invalid_assigned": 0,
+    "engineers_exceeding_capacity": [],
+    "errors": [],
+    "passed": true
+  },
+  "idempotency": {
+    "ticket_id": 24366,
+    "rows_before": 500,
+    "rows_after": 500,
+    "duplicate_detected": true,
+    "passed": true
+  },
+  "stored_rows": 500,
+  "missing_reason_rows": 0,
+  "degraded_rows_with_engineer": 0,
+  "online_assignments_rows": 0,
+  "baseline_replay_rows": 500,
+  "isolation": {
+    "table": "route_assignments",
+    "note": "离线回放只写独立表；线上 assignments 与第一步 eval_assignments 均保持原样"
+  },
+  "thresholds": {
+    "routing_valid_rate_min": 0.9,
+    "routing_timeout_rate_max": 0.2
+  },
+  "known_limits": [
+    "工程师、技能、排班均为造数，结论只说明流程跑通，接真实排班后需影子模式再校准。",
+    "所需技能取自工单真值标签；分诊模型目前只输出 type/queue/priority，上线前需补技能预测。",
+    "轮询在「派单数均衡」上天然最优，但绝大多数派单不合法；本步优先保证合法与不超容量。"
+  ],
+  "sample_decisions": [
+    {
+      "ticket_id": 24366,
+      "status": "assigned",
+      "engineer_id": 3,
+      "score": 10.4,
+      "reason": "pred_priority=medium; required_skills=[9, 11, 12]; rejects={'skill_miss': 1, 'shift_off': 9}; chosen=e3 skill=ok[12] shift=covered load=0/4 | score=10.4 = prof 8.0 + level 2.4 + load -0.0 + high 0.0 + oncall -0.0"
+    },
+    {
+      "ticket_id": 10328,
+      "status": "assigned",
+      "engineer_id": 2,
+      "score": 10.4,
+      "reason": "pred_priority=medium; required_skills=[3, 5, 12]; rejects={'skill_miss': 3, 'shift_off': 6}; chosen=e2 skill=ok[5] shift=covered load=0/4 | score=10.4 = prof 8.0 + level 2.4 + load -0.0 + high 0.0 + oncall -0.0"
+    },
+    {
+      "ticket_id": 14392,
+      "status": "manual_queue",
+      "engineer_id": null,
+      "score": null,
+      "reason": "pred_priority=low; required_skills=[5, 9, 10, 11]; rejects={'skill_miss': 6, 'load_full': 1, 'shift_off': 5}; no candidate -> manual_queue (never hard-assign)"
+    }
+  ]
+}

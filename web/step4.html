@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第四步验收 · 路由到工程师</title>
+<style>
+  :root{
+    --bg:#f7f7fc; --card:#fff; --text:#1f2937; --muted:#6b7280;
+    --line:#e5e7eb; --primary:#4f46e5; --primary-dark:#4338ca;
+    --ok:#16a34a; --ok-bg:#f0fdf4; --bad:#dc2626; --bad-bg:#fef2f2;
+    --warn:#b45309; --warn-bg:#fffbeb;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+       font-family:"Microsoft YaHei","PingFang SC",system-ui,-apple-system,sans-serif;
+       font-size:15px;line-height:1.6}
+  .wrap{max-width:1060px;margin:0 auto;padding:28px 20px 60px}
+  header h1{margin:0 0 6px;font-size:26px}
+  header p{margin:0;color:var(--muted)}
+  .tip{background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;
+       padding:14px 18px;margin:20px 0;color:#312e81}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+        padding:20px 22px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .card h2{font-size:18px;margin:0 0 14px}
+  .btns{display:flex;flex-wrap:wrap;gap:10px}
+  button{font:inherit;cursor:pointer;border-radius:9px;padding:11px 20px;border:1px solid var(--line);
+         background:#fff;color:var(--text);transition:.15s}
+  button:hover:not(:disabled){border-color:var(--primary);color:var(--primary)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .primary{background:var(--primary);color:#fff;border-color:var(--primary);
+           font-weight:600;font-size:16px;padding:13px 28px}
+  .primary:hover:not(:disabled){background:var(--primary-dark);color:#fff;border-color:var(--primary-dark)}
+  .busy{margin-top:12px;color:var(--primary);font-weight:600;display:none}
+  .err{background:var(--bad-bg);border:1px solid #fecaca;color:#991b1b;
+       padding:12px 16px;border-radius:9px;margin-top:14px;white-space:pre-wrap;display:none}
+  .overview{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .score{font-size:40px;font-weight:700;line-height:1}
+  .badge{padding:6px 16px;border-radius:999px;font-weight:600}
+  .badge.ok{background:var(--ok-bg);color:var(--ok);border:1px solid #bbf7d0}
+  .badge.bad{background:var(--bad-bg);color:var(--bad);border:1px solid #fecaca}
+  .check{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .check:last-child{border-bottom:none}
+  .dot{width:10px;height:10px;border-radius:50%;margin-top:7px;flex:none}
+  .check.ok .dot{background:var(--ok)} .check.bad .dot{background:var(--bad)}
+  .check b{font-weight:600}
+  .check .detail{color:var(--muted);font-size:13px;margin-top:2px;word-break:break-all}
+  .tag{margin-left:auto;flex:none;font-size:13px;font-weight:600}
+  .check.ok .tag{color:var(--ok)} .check.bad .tag{color:var(--bad)}
+  .nums{display:flex;gap:12px;flex-wrap:wrap}
+  .num{flex:1;min-width:135px;background:#fafaff;border:1px solid var(--line);
+       border-radius:10px;padding:14px}
+  .num .k{color:var(--muted);font-size:13px}
+  .num .v{font-size:22px;font-weight:700;margin-top:2px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left}
+  th{color:var(--muted);font-weight:600;background:#fafaff}
+  td.n{font-variant-numeric:tabular-nums;font-weight:600}
+  tr.hi td{background:#eef2ff}
+  .muted{color:var(--muted);font-size:13px}
+  .hidden{display:none}
+  select{font:inherit;width:100%;padding:10px 12px;border:1px solid var(--line);
+         border-radius:9px;background:#fff;color:var(--text)}
+  .notice{padding:12px 16px;border-radius:9px;margin:14px 0;font-weight:600}
+  .notice.ok{background:var(--ok-bg);color:#166534;border:1px solid #bbf7d0}
+  .notice.warn{background:var(--warn-bg);color:var(--warn);border:1px solid #fde68a}
+  .banner{padding:12px 16px;border-radius:9px;margin:12px 0;font-size:14px}
+  .banner.warn{background:var(--warn-bg);border:1px solid #fde68a;color:#92400e}
+  .banner.ok{background:var(--ok-bg);border:1px solid #bbf7d0;color:#166534}
+  .pill{display:inline-block;padding:1px 9px;border-radius:999px;background:#e0e7ff;
+        color:#3730a3;font-size:12px;font-weight:600;margin-right:6px}
+  pre{background:#f8fafc;border:1px solid var(--line);border-radius:9px;padding:12px 14px;
+      white-space:pre-wrap;word-break:break-all;font-size:13px;margin:8px 0}
+  footer{color:var(--muted);font-size:13px;margin-top:24px;line-height:1.9}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>第四步验收 · 路由到工程师</h1>
+    <p>硬约束 ＋ 软打分 ＋ 事务幂等 ＋ 边界降级 · 独立验收页面（端口 8768，与前三步分开）</p>
+  </header>
+
+  <div class="tip">
+    这一步把工单派给具体工程师：<b>技能、班次、负荷</b>三条硬约束一条都不能破；
+    在合格的人里按熟练度、等级、当前负荷打分；没人合格就转人工，绝不硬派。
+    所有派单写在<b>独立回放表</b>里，不碰线上派单表。点大按钮即可自动完成。
+  </div>
+
+  <div class="card">
+    <h2>操作</h2>
+    <div class="btns">
+      <button class="primary" id="btnAll">一键验收第四步（推荐）</button>
+      <button id="btnReplay">只重新回放派单</button>
+      <button id="btnMetrics">只重新计算指标</button>
+      <button id="btnStatus">刷新状态</button>
+    </div>
+    <div class="busy" id="busy">正在执行，请稍候…</div>
+    <div class="err" id="err"></div>
+  </div>
+
+  <div class="card">
+    <h2>当前状态</h2>
+    <div id="status" class="muted">正在读取…</div>
+  </div>
+
+  <div class="card">
+    <h2>亲手试一次：挑一张工单，看它为什么派给这个人</h2>
+    <div class="muted">下面是真实回放里的工单，含「能派出」和「只能转人工」两类。选一张看完整决策链（只读演练，不写库）。</div>
+    <div style="margin:12px 0"><select id="ticketSelect"><option value="">正在加载样例工单…</option></select></div>
+    <div class="btns">
+      <button class="primary" id="btnExplain">模拟派这一单</button>
+      <button id="btnIdem">重复派同一单（验证不会双派）</button>
+      <button id="btnReloadTickets">换一批工单</button>
+    </div>
+    <div id="tryResult" class="hidden" style="margin-top:16px"></div>
+  </div>
+
+  <div class="card hidden" id="resultCard">
+    <h2>验收结果</h2>
+    <div class="overview">
+      <div class="score" id="score">0 / 0</div>
+      <div>
+        <span class="badge" id="badge">未运行</span>
+        <div class="muted" id="resultHint"></div>
+      </div>
+    </div>
+    <div id="checks" style="margin-top:14px"></div>
+  </div>
+
+  <div class="card hidden" id="dataCard">
+    <h2>关键数字：与第一步的轮询基线对比</h2>
+    <div class="muted" style="margin-bottom:8px">同一批 500 条工单、同一时间映射。轮询几乎均匀但绝大多数派单不合法，这是取舍的关键。</div>
+    <table>
+      <thead><tr><th>指标</th><th>轮询基线</th><th>第四步路由</th><th>说明</th></tr></thead>
+      <tbody id="metricRows"></tbody>
+    </table>
+    <div id="tradeoff"></div>
+
+    <div class="muted" style="margin:20px 0 10px">并发压测与幂等</div>
+    <div class="nums" id="probeNums"></div>
+
+    <div class="muted" style="margin:20px 0 8px">决策样例（每条 reason 都能完整复盘）</div>
+    <div id="sampleDecisions"></div>
+
+    <div class="muted" style="margin:20px 0 8px">打分公式与已知限制</div>
+    <div id="formula" class="muted"></div>
+  </div>
+
+  <footer>
+    <div><b>这些检查在验什么（大白话）</b></div>
+    <div>1. 前三步的报告、线上派单表、第一步回放数据有没有被本步写脏。</div>
+    <div>2. 派出去的每一单是不是都真的满足技能、在岗、容量三条硬约束；有没有超容量。</div>
+    <div>3. 合法派单数、超时率是否比「按顺序轮流派」明显更好，且跨过第一步写死的门槛。</div>
+    <div>4. 没人能接时是否老实转人工；重复点击会不会把同一张工单派两次。</div>
+    <div>5. 多线程同时派单时，靠事务行锁和唯一约束能不能防住双派和超派。</div>
+    <div>6. 每条决策有没有写明理由，能不能事后复盘；有没有让大模型拍脑袋。</div>
+    <div style="margin-top:10px">本页只验收第四步。确认通过后，才会开始第五步（上线闭环）。</div>
+  </footer>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pct = (x) => (Number(x) * 100).toFixed(1) + '%';
+
+function busy(on, text) {
+  $('#busy').style.display = on ? 'block' : 'none';
+  if (text) $('#busy').textContent = text;
+  document.querySelectorAll('button').forEach(b => b.disabled = on);
+}
+function showError(msg) {
+  const e = $('#err');
+  e.style.display = msg ? 'block' : 'none';
+  e.textContent = msg || '';
+}
+async function get(url) { const r = await fetch(url); return r.json(); }
+async function post(url, payload) {
+  const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'},
+                              body: payload ? JSON.stringify(payload) : undefined});
+  return r.json();
+}
+function numBlock(k, v) {
+  return `<div class="num"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`;
+}
+
+async function refreshStatus() {
+  try {
+    const s = await get('/api/status');
+    if (!s.db_ok) { $('#status').innerHTML = `<span style="color:var(--bad)">数据库未连接：${esc(s.error)}</span>`; return; }
+    const r = s.route_rows || {};
+    $('#status').innerHTML =
+      `数据库连接正常 · 工单 ${s.tickets} 行 · 独立回放表 ` +
+      Object.entries(r).map(([k,v]) => `${esc(k)} ${v}`).join('、') + `<br>` +
+      `线上派单表 ${s.online_assignments_rows} 行（必须保持 0） · 第一步轮询回放 ${s.baseline_replay_rows} 行<br>` +
+      `前三步报告 ${[s.step1_report_exists,s.step2_report_exists,s.step3_report_exists].every(Boolean)?'均完好':'有缺失'} · ` +
+      `第四步报告 ${s.step4_report_exists?'已生成':'未生成'} · 本页端口 ${s.port}`;
+  } catch (e) { $('#status').textContent = '读取状态失败：' + e; }
+}
+
+function render(data) {
+  showError(data.error ? ('执行出错：' + data.error + (data.trace ? '\n\n' + data.trace : '')) : '');
+  const checks = data.checks || [];
+  if (!checks.length) return;
+  const passed = checks.filter(c => c.passed).length;
+  $('#resultCard').classList.remove('hidden');
+  $('#score').textContent = passed + ' / ' + checks.length;
+  const badge = $('#badge');
+  badge.textContent = data.ok ? '全部通过' : '未通过';
+  badge.className = 'badge ' + (data.ok ? 'ok' : 'bad');
+  $('#resultHint').textContent = data.ok
+    ? '第四步已完成，可以进入第五步（上线闭环）。'
+    : '请查看下面未通过的检查项。';
+  $('#checks').innerHTML = checks.map(c =>
+    `<div class="check ${c.passed?'ok':'bad'}"><span class="dot"></span>
+       <div><b>${esc(c.name)}</b><div class="detail">${esc(c.detail)}</div></div>
+       <span class="tag">${c.passed?'通过':'未通过'}</span></div>`).join('');
+  if (data.report) renderReport(data.report);
+}
+
+function renderReport(rep) {
+  $('#dataCard').classList.remove('hidden');
+  const m = rep.metrics || {}, b = m.baseline || {};
+  const rows = [
+    ['回放工单数', b.tickets, m.replay_tickets, '两轮完全一致'],
+    ['合法派单数', b.valid_count, m.assigned_count, '基线把 500 单全派了，但只有 46 单碰巧合法'],
+    ['派出记录合规率', b.valid_rate, m.constraint_compliance, '实际派出的单里满足三条硬约束的比例'],
+    ['超时率', b.timeout_rate, m.timeout_rate, '越低越好；门槛 0.20'],
+    ['负荷标准差', b.load_std, m.load_std, '轮询天然最均匀，但代价是大量非法派单'],
+    ['转人工比例', '0（基线硬派）', m.degraded_rate, '本步宁可转人工也不硬派'],
+    ['最大负荷/容量', '未约束', m.max_load_ratio, '必须 <= 1，绝无超派'],
+  ];
+  $('#metricRows').innerHTML = rows.map((r, i) =>
+    `<tr class="${i===1?'hi':''}"><td>${esc(r[0])}</td><td class="n">${esc(r[1])}</td>` +
+    `<td class="n">${esc(r[2])}</td><td class="muted">${esc(r[3])}</td></tr>`).join('');
+  $('#tradeoff').innerHTML =
+    `<div class="banner warn"><b>取舍说明</b>：${esc(m.note||'')} 合法派单数从 ${esc(b.valid_count)} 提升到 ` +
+    `${esc(m.assigned_count)}（净增 ${esc(m.legal_assignments_gain)}），代价是负荷标准差从 ${esc(b.load_std)} 变为 ` +
+    `${esc(m.load_std)}。${esc((rep.known_limits||[])[2]||'')}</div>`;
+
+  const p = rep.concurrency_probe || {}, idem = rep.idempotency || {};
+  $('#probeNums').innerHTML =
+    numBlock('并发线程 / 同一时刻工单', `${p.threads??'-'} / ${p.tickets??'-'}`) +
+    numBlock('落库行数 / 去重工单数', `${p.rows??'-'} / ${p.distinct_tickets??'-'}`) +
+    numBlock('超容量工程师', (p.engineers_exceeding_capacity||[]).length) +
+    numBlock('压测结论', p.passed ? '通过' : '未通过') +
+    numBlock('幂等复跑行数', `${idem.rows_before??'-'} → ${idem.rows_after??'-'}`);
+
+  $('#sampleDecisions').innerHTML = (rep.sample_decisions || []).map(d =>
+    `<div style="margin-bottom:10px"><span class="pill">工单 ${esc(d.ticket_id)}</span>` +
+    `${d.status === 'assigned' ? '派给工程师 ' + esc(d.engineer_id) : '<b>转人工队列</b>'}` +
+    ` · 分数 ${esc(d.score??'-')}<pre>${esc(d.reason)}</pre></div>`).join('');
+
+  const w = rep.soft_weights || {};
+  $('#formula').innerHTML =
+    `算法：${esc(rep.algorithm)}<br>` +
+    `硬约束：${esc((rep.hard_constraints||[]).join(' / '))}<br>` +
+    `软打分 = ${esc(w.proficiency)}×熟练度 + ${esc(w.level)}×等级 − ${esc(w.load)}×(负荷/容量) ` +
+    `+ ${esc(w.high_priority_level)}×等级(仅高优先级) − ${esc(w.on_call_only_penalty)}(仅值班覆盖)<br>` +
+    `输入来自 ${esc(rep.input_model)} 的分诊预测；隔离表 ${esc((rep.isolation||{}).table)}。<br>` +
+    `<b>已知限制</b>：` + (rep.known_limits||[]).map(esc).join('；');
+}
+
+async function loadTickets() {
+  const d = await get('/api/tickets');
+  if (!d.ok) { $('#ticketSelect').innerHTML = '<option value="">加载失败</option>'; return; }
+  $('#ticketSelect').innerHTML = (d.tickets || []).map(t =>
+    `<option value="${t.ticket_id}">工单 ${t.ticket_id} · ${t.priority} · 技能 ${t.required_skills.join(',')} · 预期${t.expected === 'assigned' ? '可派出' : '转人工'}</option>`
+  ).join('');
+}
+
+function renderExplain(d) {
+  const box = $('#tryResult');
+  box.classList.remove('hidden');
+  if (!d.ok) { box.innerHTML = `<div class="notice warn">${esc(d.error)}</div>`; return; }
+  const assigned = d.status === 'assigned';
+  const rejects = d.rejects || {};
+  const cand = d.candidates || [];
+  box.innerHTML =
+    `<div class="notice ${assigned?'ok':'warn'}">${assigned
+      ? '有合格工程师：将派给工程师 ' + esc(cand[0]?.engineer_id) + '（只读演练，未写库）'
+      : '没有任何工程师同时满足三条硬约束 → 转人工队列，绝不硬派'}</div>` +
+    `<div class="nums">` +
+      numBlock('工单 / 优先级', `${d.ticket_id} / ${d.priority}`) +
+      numBlock('分诊预测优先级', d.pred_priority ?? '缺失') +
+      numBlock('所需技能域', (d.required_skills||[]).join(', ') || '无') +
+      numBlock('合格候选数', d.candidate_count) +
+    `</div>` +
+    `<div class="muted" style="margin:16px 0 8px">硬约束淘汰统计：技能不匹配 ${esc(rejects.skill_miss||0)} 人 · ` +
+      `不在班 ${esc(rejects.shift_off||0)} 人 · 负荷已满 ${esc(rejects.load_full||0)} 人 · ` +
+      `未在职 ${esc(rejects.inactive||0)} 人（共 12 名工程师）</div>` +
+    (cand.length ? `<table><thead><tr><th>排名</th><th>工程师</th><th>命中技能</th><th>熟练度</th>` +
+      `<th>等级</th><th>派单时负荷/容量</th><th>仅值班</th><th>软打分明细</th><th>总分</th></tr></thead><tbody>` +
+      cand.map((c,i) => `<tr class="${i===0?'hi':''}"><td>${i+1}</td><td class="n">e${esc(c.engineer_id)}</td>` +
+        `<td>${esc((c.matched_domains||[]).join(', '))}</td><td class="n">${c.proficiency}</td>` +
+        `<td class="n">${c.level}</td><td class="n">${c.load}/${c.capacity}</td>` +
+        `<td>${c.only_on_call?'是':'否'}</td><td class="muted">${esc(Object.entries(c.parts||{}).map(([k,v])=>k+' '+v).join(' / '))}</td>` +
+        `<td class="n">${c.score}</td></tr>`).join('') + `</tbody></table>` : '') +
+    `<div class="muted" style="margin-top:12px">落库时会写入的 reason 原文：</div><pre>${esc(d.reason)}</pre>`;
+}
+
+async function runAll() {
+  busy(true, '正在回放 500 条派单并做并发压测（约需十几秒）…');
+  showError('');
+  try {
+    const data = await post('/api/run_all');
+    render(data);
+    await refreshStatus();
+    await loadTickets();
+  } catch (e) { showError('请求失败：' + e); }
+  finally { busy(false); }
+}
+async function simple(url, label) {
+  busy(true, label + '，请稍候…');
+  showError('');
+  try {
+    const d = await post(url);
+    if (!d.ok) showError('执行出错：' + (d.error || '未知错误') + (d.trace ? '\n\n' + d.trace : ''));
+    else { $('#status').textContent = d.message + '（可点「一键验收第四步」查看完整结果）'; render(d); }
+    await refreshStatus();
+  } catch (e) { showError('请求失败：' + e); }
+  finally { busy(false); }
+}
+async function doExplain() {
+  const id = $('#ticketSelect').value;
+  if (!id) { showError('请先选择一张工单'); return; }
+  busy(true, '正在演练这张工单的派单决策…');
+  showError('');
+  try {
+    const d = await post('/api/explain', {ticket_id: Number(id)});
+    renderExplain(d);
+  } catch (e) { showError('请求失败：' + e); }
+  finally { busy(false); }
+}
+async function doIdem() {
+  busy(true, '正在重复派单，检查会不会双派…');
+  showError('');
+  try {
+    const d = await post('/api/idempotency');
+    const r = d.result || {};
+    $('#tryResult').classList.remove('hidden');
+    $('#tryResult').innerHTML = d.ok
+      ? `<div class="notice ${r.passed?'ok':'warn'}">${r.passed ? '幂等生效：没有产生第二条派单' : '幂等检查未通过'}</div>` +
+        `<pre>工单 ${esc(r.ticket_id)}：回放表行数 ${esc(r.rows_before)} → ${esc(r.rows_after)}，重复请求被识别 = ${esc(r.duplicate_detected)}</pre>`
+      : `<div class="notice warn">${esc(d.error)}</div>`;
+  } catch (e) { showError('请求失败：' + e); }
+  finally { busy(false); }
+}
+
+$('#btnAll').onclick = runAll;
+$('#btnReplay').onclick = () => simple('/api/replay', '正在重新回放派单');
+$('#btnMetrics').onclick = () => simple('/api/metrics', '正在从报告重新计算指标');
+$('#btnStatus').onclick = refreshStatus;
+$('#btnExplain').onclick = doExplain;
+$('#btnIdem').onclick = doIdem;
+$('#btnReloadTickets').onclick = loadTickets;
+window.addEventListener('load', async () => { await refreshStatus(); await loadTickets(); });
+</script>
+</body>
+</html>
