@@ -1,0 +1,3 @@
+目录占位：原始工单 CSV 不随仓库分发。
+请将 aa_dataset-tickets-multi-lang-5-2-50-version.csv 放在此目录后运行 scripts/etl.py。
+数据集许可证 cc-by-nc-4.0，禁止商用。

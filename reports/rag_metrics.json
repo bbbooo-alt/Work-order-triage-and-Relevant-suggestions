@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-10T07:49:22",
+  "generated_at": "2026-11-10T13:05:24",
   "corpus": {
     "answer": 3032,
     "kb": 12,
@@ -11,7 +11,7 @@
   ],
   "golden_set": {
     "size": 50,
-    "file": "F:\\0MyProject\\工单分诊与解决建议\\eval\\golden_set.csv",
+    "file": "eval/golden_set.csv",
     "label_type": "weak_label",
     "note": "弱标注：以工单首个技能域对应的权威知识文档作为相关文档，非人工逐条标注"
   },

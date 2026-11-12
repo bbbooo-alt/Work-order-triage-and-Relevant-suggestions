@@ -1,0 +1,9 @@
+# 工单分诊与解决建议 · Python 依赖
+# 要求 Python >= 3.10（代码使用 str | None 等 PEP 604 类型标注）
+# 安装：pip install -r requirements.txt
+
+psycopg2-binary>=2.9.9
+numpy>=1.24
+scikit-learn>=1.3
+pandas>=2.0
+requests>=2.31

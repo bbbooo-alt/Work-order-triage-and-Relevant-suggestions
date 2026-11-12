@@ -6,7 +6,7 @@
     "total": 50,
     "reviewed": 0,
     "draft": 50,
-    "file": "F:\\0MyProject\\工单分诊与解决建议\\eval\\golden_set_human.csv",
+    "file": "eval/golden_set_human.csv",
     "note": "草稿由领域规则预填；页面标注台勾选后会把 reviewed 置为 true 并记 annotator=human_via_ui"
   },
   "golden_retrieval": {
@@ -170,7 +170,7 @@
     "cache_rows": 3
   },
   "manual_review": {
-    "file": "F:\\0MyProject\\工单分诊与解决建议\\eval\\generation_review.csv",
+    "file": "eval/generation_review.csv",
     "pending": [
       {
         "ticket_id": 1255,

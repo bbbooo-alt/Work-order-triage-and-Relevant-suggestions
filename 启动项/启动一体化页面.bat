@@ -3,16 +3,7 @@ chcp 65001 >nul
 cd /d "%~dp0.."
 title Unified Console - keep this window open
 
-echo Checking local PostgreSQL...
-"F:\pgsql\pgsql\bin\pg_isready.exe" -h 127.0.0.1 -p 5432 >nul 2>&1
-if errorlevel 1 (
-  echo Starting local PostgreSQL...
-  "F:\pgsql\pgsql\bin\pg_ctl.exe" -D "F:\pgdata" -l "F:\pgdata\logfile" start >nul
-  timeout /t 2 >nul
-)
-
-echo Checking local Ollama (embedding + generation)...
-python -c "import sys; sys.path.insert(0,'scripts'); import knowledge; print('Ollama ready' if knowledge.ensure_ollama() else 'Ollama NOT available')"
+call "%~dp0_env_check.bat" ollama
 
 echo.
 echo Unified console: http://127.0.0.1:8770/

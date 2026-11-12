@@ -1,0 +1,56 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+build/
+dist/
+*.egg-info/
+.venv/
+venv/
+env/
+.python-version
+.pytest_cache/
+.mypy_cache/
+
+# ---- 环境变量 / 凭据（不要提交）----
+.env
+.env.local
+*.env
+!.env.example
+.pgpass
+*secrets*
+!**/.gitkeep
+
+# 本机 PostgreSQL 路径配置（含绝对路径，只在本机生效）
+/启动项/local_env.bat
+
+# ---- 数据集与中间产物 ----
+# 原始工单数据集受 cc-by-nc-4.0（禁止商用）约束，且约 25 MB；
+# processed/ 由 scripts/etl.py 生成，约 30 MB，均可本地重建。
+/data/raw/*
+!/data/raw/.gitkeep
+/data/processed/*
+!/data/processed/.gitkeep
+
+# ---- 运行日志 / 临时文件 ----
+*.log
+logfile
+*.tmp
+*.bak
+*.swp
+tmp/
+.tmp/
+
+# ---- 编辑器 / 操作系统 ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- 可选 ----
+# reports/ 默认保留（11 份 JSON 是验收证据）。若希望 clone 后从零复现，
+# 取消下一行注释；注意 8770/8771 的报告检查项需要这些文件。
+# /reports/*.json

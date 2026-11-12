@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-10T07:49:45",
+  "generated_at": "2026-11-10T13:05:26",
   "model_version": "route-v1",
   "input_model": "triage-l1-v1",
   "algorithm": "逐条贪心：硬约束过滤 + 加权软打分（批量最优/匈牙利算法留作二期）",

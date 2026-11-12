@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-11-10T07:50:16",
+  "generated_at": "2026-11-10T13:05:50",
   "pipeline_version": "unified-pipeline-v1",
-  "elapsed_sec": 2.01,
+  "elapsed_sec": 1.82,
   "ok": true,
   "checks": [
     {
@@ -308,7 +308,7 @@
         {
           "name": "第四步报告独立落盘",
           "passed": true,
-          "detail": "F:\\0MyProject\\工单分诊与解决建议\\reports\\routing_metrics.json"
+          "detail": "reports/routing_metrics.json"
         }
       ]
     },
@@ -387,7 +387,7 @@
         {
           "name": "第五步报告独立落盘",
           "passed": true,
-          "detail": "F:\\0MyProject\\工单分诊与解决建议\\reports\\lifecycle_metrics.json"
+          "detail": "reports/lifecycle_metrics.json"
         }
       ]
     },
@@ -426,7 +426,7 @@
         {
           "name": "真值上界与实际结果都写进了独立报告",
           "passed": true,
-          "detail": "F:\\0MyProject\\工单分诊与解决建议\\reports\\skills_impact.json；第四步原有 route-v1 回放保持不变"
+          "detail": "reports/skills_impact.json；第四步原有 route-v1 回放保持不变"
         }
       ]
     },
@@ -440,7 +440,7 @@
         {
           "name": "人工标注集已建立并可复核",
           "passed": true,
-          "detail": "共 50 条，已人工复核 0 条、草稿 50 条；导出 F:\\0MyProject\\工单分诊与解决建议\\eval\\golden_set_human.csv"
+          "detail": "共 50 条，已人工复核 0 条、草稿 50 条；导出 eval/golden_set_human.csv"
         },
         {
           "name": "用标注集重算了检索指标",
@@ -465,7 +465,7 @@
         {
           "name": "幻觉抽检信号可用",
           "passed": true,
-          "detail": "平均词面 grounding 0.5556；另有人工评分表 F:\\0MyProject\\工单分诊与解决建议\\eval\\generation_review.csv"
+          "detail": "平均词面 grounding 0.5556；另有人工评分表 eval/generation_review.csv"
         },
         {
           "name": "只检索 vs 检索+生成两套结果已对比",
@@ -534,14 +534,14 @@
         {
           "name": "闭环报告独立落盘",
           "passed": true,
-          "detail": "F:\\0MyProject\\工单分诊与解决建议\\reports\\closed_loop_metrics.json"
+          "detail": "reports/closed_loop_metrics.json"
         }
       ]
     }
   ],
   "trace": {
     "ok": true,
-    "generated_at": "2026-11-10T07:50:16",
+    "generated_at": "2026-11-10T13:05:50",
     "ticket": {
       "ticket_id": 2338,
       "split": "test",
@@ -563,7 +563,7 @@
         "key": "intake",
         "name": "① 工单接入与 PII 脱敏",
         "status": "ok",
-        "elapsed_ms": 1,
+        "elapsed_ms": 0,
         "summary": "工单 #2338（test），展示文本已脱敏",
         "data": {
           "ticket_id": 2338,
@@ -638,7 +638,7 @@
         "key": "retrieval",
         "name": "④ 混合检索与拒答（第三步）",
         "status": "ok",
-        "elapsed_ms": 650,
+        "elapsed_ms": 642,
         "summary": "召回 5 条片段，权威知识 5 条",
         "data": {
           "mode": "hybrid",
@@ -752,7 +752,7 @@
         "key": "routing",
         "name": "⑥ 技能∩排班∩容量路由（第四步）",
         "status": "ok",
-        "elapsed_ms": 93,
+        "elapsed_ms": 90,
         "summary": "派给工程师 e6，得分 12.1",
         "data": {
           "status": "assigned",
@@ -819,7 +819,7 @@
         "key": "gate",
         "name": "⑦ 置信度＋风险自动档门禁（P0-3 / 第五步）",
         "status": "warn",
-        "elapsed_ms": 53,
+        "elapsed_ms": 159,
         "summary": "门禁拒绝（confidence_ok, risk_low），转人工确认",
         "data": {
           "allowed": false,
@@ -844,7 +844,7 @@
             "retrieval_grounded": true,
             "routing_assigned": true
           },
-          "calibration_file": "F:\\0MyProject\\工单分诊与解决建议\\eval\\calibration.json"
+          "calibration_file": "eval/calibration.json"
         }
       }
     ],
@@ -887,8 +887,8 @@
         "note": "路由为 dry_run，只写独立审计表 pipeline_runs，线上 assignments 保持 0 行"
       }
     },
-    "elapsed_ms": 893,
-    "run_id": 8
+    "elapsed_ms": 987,
+    "run_id": 12
   },
   "readiness": {
     "db_ok": true,
@@ -911,34 +911,34 @@
       "drift_snapshots": 2,
       "auto_assignments": 11,
       "model_registry": 1,
-      "pipeline_runs": 7,
+      "pipeline_runs": 11,
       "assignments": 0
     },
     "reports": {
       "step1": {
         "file": "baseline_metrics.json",
         "exists": true,
-        "generated_at": "2026-11-10T07:47:25"
+        "generated_at": "2026-11-10T13:03:17"
       },
       "step2": {
         "file": "triage_metrics.json",
         "exists": true,
-        "generated_at": "2026-11-10T07:48:01"
+        "generated_at": "2026-11-10T13:03:57"
       },
       "step3": {
         "file": "rag_metrics.json",
         "exists": true,
-        "generated_at": "2026-11-10T07:49:22"
+        "generated_at": "2026-11-10T13:05:24"
       },
       "step4": {
         "file": "routing_metrics.json",
         "exists": true,
-        "generated_at": "2026-11-10T07:49:45"
+        "generated_at": "2026-11-10T13:05:26"
       },
       "step5": {
         "file": "lifecycle_metrics.json",
         "exists": true,
-        "generated_at": "2026-11-10T07:50:06"
+        "generated_at": "2026-11-10T13:05:48"
       },
       "p0_1": {
         "file": "skills_metrics.json",
